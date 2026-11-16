@@ -205,9 +205,9 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
 .meta-row span:last-child{font-variant-numeric:tabular-nums;letter-spacing:.2px;text-align:right}
 .drawer-foot{padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0}
 .amap-row{display:flex;gap:8px;margin-top:8px}
-.amap-row a{flex:1;height:34px;line-height:32px;text-align:center;border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);text-decoration:none;letter-spacing:.3px;transition:.18s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.amap-row a:hover{border-color:var(--accent);color:var(--accent)}
-.amap-row a.primary{border-color:var(--accent);color:var(--accent);background:rgba(200,169,106,.10)}
+.amap-row button{flex:1;height:34px;line-height:32px;text-align:center;border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);background:transparent;cursor:pointer;letter-spacing:.3px;transition:.18s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:inherit}
+.amap-row button:hover{border-color:var(--accent);color:var(--accent)}
+.amap-row button.primary{border-color:var(--accent);color:var(--accent);background:rgba(200,169,106,.10)}
 
 /* Mobile */
 #overlay{display:none}
@@ -326,8 +326,8 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
     <div class="drawer-foot">
       <button id="btnLocate" style="width:100%;height:38px;border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:8px;font-size:12.5px;cursor:pointer;letter-spacing:.5px" data-zh="在地图上居中" data-en="Center on Map">在地图上居中</button>
       <div class="amap-row">
-        <a id="amapView" href="#" target="_blank" rel="noopener" data-zh="高德地图查看" data-en="View on Amap">高德地图查看</a>
-        <a id="amapNav" class="primary" href="#" target="_blank" rel="noopener" data-zh="导航到这里" data-en="Navigate">导航到这里</a>
+        <button type="button" id="amapView" data-zh="高德地图查看" data-en="View on Amap">高德地图查看</button>
+        <button type="button" id="amapNav" class="primary" data-zh="导航到这里" data-en="Navigate">导航到这里</button>
       </div>
     </div>
   </aside>
@@ -1208,8 +1208,8 @@ function selectPoint(no,fly){
   }else{
     distRow.style.display='none';
   }
-  document.getElementById('amapView').href=amapMarker(p);
-  document.getElementById('amapNav').href=amapNavUrl(p);
+  document.getElementById('amapView').disabled=false;
+  document.getElementById('amapNav').disabled=false;
   renderDrawerImage(p);
   drawer.classList.add('open');
   document.getElementById('overlay').classList.add('show');
@@ -1295,14 +1295,15 @@ function savePhotos(){
 }
 function renderDrawerImage(p){
   const box=document.getElementById('dImg');
+  photoFor=p.no;
   box.innerHTML=p.img?('<img alt="">'):lineIcon(CATS[p.cat].color);
   if(p.img)box.querySelector('img').src=p.img;
-  const btn=document.createElement('button');
-  btn.type='button';
-  btn.className='img-btn';
-  btn.textContent=p.img?(S.lang==='zh'?'更换照片':'Replace'):(S.lang==='zh'?'添加照片':'Add photo');
-  btn.onclick=()=>{photoFor=p.no;document.getElementById('photoInput').click();};
-  box.appendChild(btn);
+  /* 用 label[for] 原生触发文件选择：比 input.click() 在 iOS / 隐私模式下可靠 */
+  const lab=document.createElement('label');
+  lab.className='img-btn';
+  lab.setAttribute('for','photoInput');
+  lab.textContent=p.img?(S.lang==='zh'?'更换照片':'Replace'):(S.lang==='zh'?'添加照片':'Add photo');
+  box.appendChild(lab);
   if(p.img){
     const del=document.createElement('button');
     del.type='button';
@@ -1649,6 +1650,23 @@ function amapNavUrl(p){
   if(myPos)u+='&from='+myPos.lon.toFixed(6)+','+myPos.lat.toFixed(6)+','+encodeURIComponent(S.lang==='zh'?'我的位置':'My location');
   return u;
 }
+/* 高德入口：点击时现场生成链接，避免依赖 href 是否被成功写入 */
+function openAmap(url){
+  let w=null;
+  try{w=window.open(url,'_blank');}catch(e){}
+  if(!w){
+    try{navigator.clipboard&&navigator.clipboard.writeText(url);}catch(e){}
+    toast(S.lang==='zh'?'链接已复制，粘贴到浏览器即可打开':'Link copied — paste into a browser tab');
+  }
+}
+document.getElementById('amapView').onclick=()=>{
+  const p=byNo[S.activeId];
+  if(p)openAmap(amapMarker(p));
+};
+document.getElementById('amapNav').onclick=()=>{
+  const p=byNo[S.activeId];
+  if(p)openAmap(amapNavUrl(p));
+};
 
 /* ========== 14. 顶部按钮 ========== */
 document.getElementById('btnTheme').onclick=()=>{
@@ -1708,6 +1726,42 @@ function applyLang(){
   if(myPos)renderNear();
 }
 
+/* ========== 15.5 版本与自检 ========== */
+const BUILD='2026-11-16 16:20';
+window.__CD_BUILD=BUILD;
+let lastError='';
+window.addEventListener('error',e=>{
+  lastError=(e.message||'')+' @'+String(e.filename||'').split('/').pop()+':'+(e.lineno||'');
+});
+window.addEventListener('unhandledrejection',e=>{
+  lastError='Promise: '+((e.reason&&e.reason.message)||String(e.reason));
+});
+try{console.log('%c成都样本 build '+BUILD,'color:#C8A96A');}catch(e){}
+
+function initDebug(){
+  if(typeof location==='undefined'||!/[?&]debug/.test(location.search))return;
+  if(!document.body)return;
+  const pre=document.createElement('pre');
+  pre.style.cssText='position:fixed;left:8px;bottom:8px;z-index:9999;max-width:92vw;max-height:42vh;overflow:auto;background:rgba(10,14,18,.94);color:#9fe6b0;font:11px/1.6 monospace;padding:10px 12px;border:1px solid #2a3542;border-radius:8px;white-space:pre-wrap';
+  document.body.appendChild(pre);
+  const upd=()=>{
+    const p=byNo[S.activeId];
+    pre.textContent=[
+      'build       '+BUILD,
+      'photoInput  '+(document.getElementById('photoInput')?'ok':'MISSING'),
+      'photoStore  '+(document.getElementById('photoStore')?'ok':'MISSING'),
+      'photos      '+Object.keys(PHOTOS).length,
+      'AMap        '+(AMAP_ENABLED?('enabled / active='+amapActive):'disabled'),
+      'selected    '+(p?('#'+p.no+' '+p.zh):'—'),
+      'amap view   '+(p?amapMarker(p):'—'),
+      'amap nav    '+(p?amapNavUrl(p):'—'),
+      'last error  '+(lastError||'none')
+    ].join('\n');
+  };
+  upd();
+  setInterval(upd,1000);
+}
+
 /* ========== 16. 初始化 ========== */
 function init(){
   POINTS.forEach(p=>{if(PHOTOS[p.no])p.img=PHOTOS[p.no];});
@@ -1725,6 +1779,7 @@ function init(){
   document.getElementById('badgeSrc').textContent='底图 内置简化轮廓 · 正在同步官方数据…';
   document.getElementById('btnTheme').textContent='☀';
   applyLang();
+  initDebug();
   loadBase();
   if(AMAP_ENABLED){
     loadAmapSDK().then(()=>{
