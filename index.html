@@ -109,6 +109,10 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
 /* Map */
 #mapWrap{flex:1;position:relative;overflow:hidden;background:var(--map-bg);transition:background .35s}
 #map{position:absolute;top:0;left:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+#amap{position:absolute;inset:0;z-index:1;pointer-events:none}
+#amap.amap-live{pointer-events:auto}
+.am-dot{width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 1.5px rgba(0,0,0,.35);transition:transform .15s}
+.am-dot.on{transform:scale(1.5);box-shadow:0 0 0 2px #fff}
 #map.dragging{cursor:grabbing}
 #map.picking{cursor:crosshair}
 
@@ -171,6 +175,8 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
 .map-badge b{color:var(--accent);font-weight:600}
 .map-badge .src{font-size:9.5px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .map-badge .src.warn{color:var(--accent);opacity:.9}
+#mapWrap.amap-on .map-badge{top:14px;bottom:auto}
+#mapWrap.amap-on .map-credit{display:none}
 
 /* Drawer */
 #drawer{position:absolute;top:0;right:0;width:392px;max-width:100%;height:100%;background:var(--panel);border-left:1px solid var(--border);box-shadow:var(--shadow);transform:translateX(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);z-index:35;display:flex;flex-direction:column}
@@ -794,14 +800,135 @@ async function loadBase(){
     ]);
     const ok=validateGeo(pair[0],pair[1]);
     buildBase(fromLive(ok.dist,ok.cityF,SIMPLIFY_LIVE));
-    badge.textContent='底图 DataV GeoAtlas 510100 · 20 区县 · 在线';
+    badge.textContent=amapActive?'底图 高德地图 · 20 区县':'底图 DataV GeoAtlas 510100 · 20 区县 · 在线';
   }catch(err){
     console.warn('[底图] 在线 GeoJSON 不可用，改用内置轮廓：',err&&err.message||err);
     buildBase(fromFallback());
-    badge.textContent='底图 内置简化轮廓（DataV 510100）· 20 区县 · 离线';
+    badge.textContent=amapActive?'底图 高德地图 · 20 区县（内置轮廓兜底）':'底图 内置简化轮廓（DataV 510100）· 20 区县 · 离线';
     badge.classList.add('warn');
   }
   window.__geoReady=true;
+}
+
+/* ========== 6.5 高德底图（填 Key 后启用；留空则用上面的 SVG 底图） ========== */
+const AMAP_KEY='81060cc5e8934559e03f8433116b1620';   /* 高德开放平台 → Web端(JS API) Key */
+const AMAP_SEC='1aeffe916e1c1aebd290c77794fd652f';   /* 同页的「安全密钥 jscode」 */
+const AMAP_ENABLED=!!(AMAP_KEY&&AMAP_SEC);
+let amapActive=false;
+let amap=null, amapMe=null, amapRoute=null;
+const amapMarks=[];
+
+function loadAmapSDK(){
+  return new Promise((resolve,reject)=>{
+    if(window.AMap)return resolve();
+    if(AMAP_SEC)window._AMapSecurityConfig={securityJsCode:AMAP_SEC};
+    const s=document.createElement('script');
+    s.src='https://webapi.amap.com/maps?v=2.0&key='+encodeURIComponent(AMAP_KEY)+'&plugin=AMap.Geolocation';
+    s.async=true;
+    s.onload=()=>resolve();
+    s.onerror=()=>reject(new Error('AMap SDK load failed'));
+    document.head.appendChild(s);
+  });
+}
+function amapDot(color,active){
+  return '<div class="am-dot'+(active?' on':'')+'" style="background:'+color+'"></div>';
+}
+function initAmap(){
+  const wrap=document.getElementById('mapWrap');
+  const holder=document.createElement('div');
+  holder.id='amap';
+  wrap.insertBefore(holder, document.getElementById('map'));
+  amap=new AMap.Map(holder,{
+    zoom:11,center:[CX,CY],viewMode:'2D',
+    mapStyle:S.theme==='dark'?'amap://styles/dark':'amap://styles/normal'
+  });
+  amap.on('complete',()=>{
+    amapActive=true;
+    document.getElementById('map').style.display='none';
+    document.getElementById('mapWrap').classList.add('amap-on');
+    const h=document.getElementById('amap');
+    if(h)h.classList.add('amap-live');
+    renderPoints();renderList();updateCounts();
+    document.getElementById('badgeSrc').textContent='底图 高德地图 · 20 区县';
+  });
+  POINTS.forEach(p=>{
+    const m=new AMap.Marker({
+      position:[p.lon,p.lat],
+      content:amapDot(CATS[p.cat].color,false),
+      offset:new AMap.Pixel(-5,-5),
+      title:p.zh,
+      zIndex:100
+    });
+    m.on('click',()=>{if(!pickMode)selectPoint(p.no,false);});
+    p._am=m;amapMarks.push(m);
+  });
+  amap.add(amapMarks);
+  amap.on('moveend',()=>{renderList();updateCounts();});
+  amap.on('zoomend',()=>{renderList();updateCounts();});
+  amap.on('click',e=>{
+    if(!pickMode)return;
+    setPos(e.lnglat.getLng(),e.lnglat.getLat(),null,true);
+    exitPick();
+  });
+}
+function amapSync(){
+  if(!amap)return;
+  POINTS.forEach(p=>{
+    if(!p._am)return;
+    if(ptVisible(p))p._am.show();else p._am.hide();
+    p._am.setContent(amapDot(CATS[p.cat].color,S.activeId===p.no));
+  });
+}
+function amapDrawRoute(){
+  if(!amap)return;
+  if(amapRoute){amap.remove(amapRoute);amapRoute=null;}
+  if(!S.routeOn)return;
+  const r=ROUTES.find(x=>x.id===S.routeOn);
+  if(!r)return;
+  const path=r.pts.map(n=>byNo[n]).filter(Boolean).map(p=>[p.lon,p.lat]);
+  if(path.length<2)return;
+  amapRoute=new AMap.Polyline({
+    path,strokeColor:r.color,strokeWeight:3,strokeStyle:'dashed',
+    strokeDasharray:[8,6],lineJoin:'round',zIndex:60
+  });
+  amap.add(amapRoute);
+  amap.setFitView([amapRoute]);
+}
+function amapDrawMe(){
+  if(!amap)return;
+  if(amapMe){amap.remove(amapMe);amapMe=null;}
+  if(!myPos)return;
+  const acc=new AMap.Circle({
+    center:[myPos.lon,myPos.lat],radius:myPos.acc||30,
+    strokeColor:'#3D8BFD',strokeWeight:1,strokeOpacity:.5,
+    fillColor:'#3D8BFD',fillOpacity:.12,zIndex:190
+  });
+  const dot=new AMap.CircleMarker({
+    center:[myPos.lon,myPos.lat],radius:7,
+    strokeColor:'#FFFFFF',strokeWeight:2,
+    fillColor:'#3D8BFD',fillOpacity:1,zIndex:200
+  });
+  amapMe=[acc,dot];
+  amap.add(amapMe);
+}
+function amapLocate(){
+  const geo=new AMap.Geolocation({
+    enableHighAccuracy:true,timeout:10000,
+    showButton:false,showMarker:false,showCircle:false
+  });
+  geo.getCurrentPosition((status,result)=>{
+    geoBtn.classList.remove('loading');
+    if(status==='complete'&&result&&result.position){
+      geoBtn.classList.add('on');
+      setPos(result.position.getLng(),result.position.getLat(),result.accuracy||null,false);
+      return;
+    }
+    const info=(result&&result.info)||'';
+    toast(info==='PERMISSION_DENIED'
+      ?(S.lang==='zh'?'已拒绝定位权限':'Location permission denied')
+      :(S.lang==='zh'?'高德定位失败，已改为手动选点':'Amap locate failed — manual pick'));
+    enterPick();
+  });
 }
 
 /* ========== 7. 视图 / 尺寸 ========== */
@@ -823,12 +950,14 @@ function fitAspect(vb){
   return [vb[0]-(w-vb[2])/2,vb[1],w,vb[3]];
 }
 function setVB(vb){
+  if(amapActive)return;
   S.vb=vb;
   svg.setAttribute('viewBox',vb.map(v=>v.toFixed(2)).join(' '));
   updateScales();
   scheduleViewRefresh();
 }
 function updateScales(){
+  if(amapActive)return;
   if(!S.vb)return;
   const u=unitsPerPx();
   S.u=u;
@@ -897,11 +1026,16 @@ function ptVisible(p){
   return true;
 }
 function inView(p){
+  if(amapActive&&amap){
+    const b=amap.getBounds();
+    return b?b.contains([p.lon,p.lat]):true;
+  }
   const x0=S.vb[0],y0=S.vb[1],x1=x0+S.vb[2],y1=y0+S.vb[3];
   const x=wx(p.lon),y=wy(p.lat);
   return x>=x0&&x<=x1&&y>=y0&&y<=y1;
 }
 function renderPoints(){
+  if(amapActive){amapSync();return;}
   gPts.innerHTML='';
   const u=S.u;
   POINTS.forEach(p=>{
@@ -920,6 +1054,7 @@ function renderPoints(){
   updateScales();
 }
 function renderRoutes(){
+  if(amapActive){amapDrawRoute();return;}
   gRoute.innerHTML='';
   if(!S.routeOn)return;
   const r=ROUTES.find(x=>x.id===S.routeOn);
@@ -930,6 +1065,7 @@ function renderRoutes(){
   gRoute.appendChild(el('path',{d,class:'route-path',stroke:r.color}));
 }
 function fitRoute(r){
+  if(amapActive)return;
   const pts=r.pts.map(n=>byNo[n]).filter(Boolean);
   if(!pts.length)return;
   const lons=pts.map(p=>p.lon),lats=pts.map(p=>p.lat);
@@ -1058,12 +1194,16 @@ function selectPoint(no,fly){
   drawer.classList.add('open');
   document.getElementById('overlay').classList.add('show');
   if(fly){
-    const spanX=S.vb[2]*(S.view==='city'?0.5:0.55);
-    const spanY=S.vb[3]*(S.view==='city'?0.5:0.55);
-    animateVB(fitAspect(vbOf({
-      lon0:p.lon-spanX/2/KX,lon1:p.lon+spanX/2/KX,
-      lat0:p.lat-spanY/2/KY,lat1:p.lat+spanY/2/KY
-    })));
+    if(amapActive&&amap){
+      amap.setZoomAndCenter(14,[p.lon,p.lat]);
+    }else{
+      const spanX=S.vb[2]*(S.view==='city'?0.5:0.55);
+      const spanY=S.vb[3]*(S.view==='city'?0.5:0.55);
+      animateVB(fitAspect(vbOf({
+        lon0:p.lon-spanX/2/KX,lon1:p.lon+spanX/2/KX,
+        lat0:p.lat-spanY/2/KY,lat1:p.lat+spanY/2/KY
+      })));
+    }
   }
 }
 function closeDrawer(){
@@ -1242,6 +1382,7 @@ function toast(msg){
   clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),3600);
 }
 function drawMe(){
+  if(amapActive){amapDrawMe();return;}
   gMe.innerHTML='';meEls=null;
   if(!myPos)return;
   const x=wx(myPos.lon),y=wy(myPos.lat);
@@ -1302,6 +1443,7 @@ function applyFix(pos){
   setPos(g[0],g[1],c.accuracy||30,false);
 }
 function flyToMe(){
+  if(amapActive&&amap){amap.setZoomAndCenter(14,[myPos.lon,myPos.lat]);return;}
   const span=Math.max(0.03,(myPos.acc||40)*5/95000);
   animateVB(fitAspect(vbOf({
     lon0:myPos.lon-span/2,lon1:myPos.lon+span/2,
@@ -1332,6 +1474,7 @@ function startLocate(){
     return;
   }
   geoBtn.classList.add('loading');
+  if(amapActive&&amap){amapLocate();return;}
   navigator.geolocation.getCurrentPosition(
     pos=>{geoBtn.classList.remove('loading');geoBtn.classList.add('on');applyFix(pos);watchMe();},
     err=>{
@@ -1357,6 +1500,7 @@ function stopLocate(){
   myPos=null;drawMe();nearCard.hidden=true;
   geoBtn.classList.remove('on','loading');
   gMe.innerHTML='';
+  if(amapActive)amapDrawMe();
   exitPick();
 }
 function errMsg(err){
@@ -1392,6 +1536,7 @@ document.getElementById('btnTheme').onclick=()=>{
   document.documentElement.dataset.theme=S.theme;
   document.getElementById('btnTheme').textContent=S.theme==='dark'?'☀':'☾';
   document.getElementById('metaTheme').setAttribute('content',S.theme==='dark'?'#0E1116':'#F4F2EC');
+  if(amapActive&&amap)amap.setMapStyle(S.theme==='dark'?'amap://styles/dark':'amap://styles/normal');
 };
 document.getElementById('btnLang').onclick=()=>{
   S.lang=S.lang==='zh'?'en':'zh';
@@ -1402,7 +1547,11 @@ document.getElementById('btnLang').onclick=()=>{
 };
 document.getElementById('btnView').onclick=()=>{
   S.view=S.view==='city'?'all':'city';
-  animateVB(fitAspect(vbOf(VIEWS[S.view])));
+  if(amapActive&&amap){
+    amap.setZoomAndCenter(S.view==='city'?13:10,[CX,CY]);
+  }else{
+    animateVB(fitAspect(vbOf(VIEWS[S.view])));
+  }
   applyLang();
 };
 document.getElementById('search').addEventListener('input',e=>{
@@ -1455,6 +1604,25 @@ function init(){
   document.getElementById('btnTheme').textContent='☀';
   applyLang();
   loadBase();
+  if(AMAP_ENABLED){
+    loadAmapSDK().then(()=>{
+      initAmap();
+      S.view='all';
+      amap.setZoomAndCenter(10,[CX,CY]);
+      /* 12 秒内没收到 complete，说明 Key / 安全密钥 / 域名白名单有问题，退回内置底图 */
+      setTimeout(()=>{
+        if(amapActive)return;
+        const h=document.getElementById('amap');
+        if(h)h.remove();
+        amap=null;
+        console.warn('[高德] 地图未完成加载，请检查 Key 域名白名单');
+        toast(S.lang==='zh'?'高德底图未加载，已使用内置底图（检查域名白名单）':'Amap map failed, using built-in basemap');
+      },12000);
+    }).catch(err=>{
+      console.warn('[高德] SDK 加载失败，继续使用内置底图',err&&err.message||err);
+      toast(S.lang==='zh'?'高德底图加载失败，已使用内置底图':'Amap SDK failed, using built-in basemap');
+    });
+  }
 }
 init();
 
