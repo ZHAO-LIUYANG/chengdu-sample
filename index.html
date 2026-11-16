@@ -110,6 +110,7 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
 #mapWrap{flex:1;position:relative;overflow:hidden;background:var(--map-bg);transition:background .35s}
 #map{position:absolute;top:0;left:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
 #map.dragging{cursor:grabbing}
+#map.picking{cursor:crosshair}
 
 /* 底图要素：面 / 区县界 / 市域线 / 注记 */
 .district-fill{fill:var(--district-fill);stroke:var(--district-fill);stroke-linejoin:round}
@@ -124,8 +125,32 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
 .road-main{fill:none;stroke:var(--road-main);stroke-linecap:round;stroke-linejoin:round}
 .road-local{fill:none;stroke:var(--road-local);stroke-linecap:round;stroke-linejoin:round}
 .map-credit{position:absolute;right:14px;bottom:14px;font-size:9px;letter-spacing:.2px;color:var(--dim);opacity:.7;pointer-events:none;z-index:14;text-align:right}
-@media(max-width:860px){.map-credit{right:10px;bottom:calc(46px + env(safe-area-inset-bottom));font-size:8px}}
-.district-label{fill:var(--map-label);text-anchor:middle;dominant-baseline:central;pointer-events:none;letter-spacing:.6px;paint-order:stroke;stroke:var(--map-bg);stroke-linejoin:round}
+/* 我的位置 */
+.geo-btn{position:absolute;right:14px;bottom:44px;width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--panel);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow);z-index:16;transition:.18s;padding:0}
+.geo-btn:hover{border-color:var(--accent);color:var(--accent)}
+.geo-btn.on{border-color:var(--accent);color:var(--accent);background:rgba(200,169,106,.12)}
+.geo-btn.loading svg{animation:geo-spin 1s linear infinite}
+@keyframes geo-spin{to{transform:rotate(360deg)}}
+.me-acc{fill:rgba(61,139,253,.10);stroke:rgba(61,139,253,.40);stroke-width:1px;vector-effect:non-scaling-stroke}
+.me-pulse{opacity:.28;transform-box:fill-box;transform-origin:center;animation:me-pulse 2.4s ease-out infinite}
+@keyframes me-pulse{0%{transform:scale(.7);opacity:.35}70%{transform:scale(2.1);opacity:0}100%{opacity:0}}
+.me-ring{stroke:var(--map-bg);stroke-width:2px;vector-effect:non-scaling-stroke}
+.me-dot{stroke:#fff;stroke-width:2px;vector-effect:non-scaling-stroke}
+.near-card{position:absolute;left:14px;bottom:52px;width:272px;max-height:236px;background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);z-index:17;display:flex;flex-direction:column;overflow:hidden}
+.near-card[hidden]{display:none}
+.near-head{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid var(--border);font-size:11px;letter-spacing:1px;color:var(--dim)}
+.near-head b{color:var(--accent);font-weight:600;letter-spacing:0}
+.near-head button{border:none;background:transparent;color:var(--dim);font-size:13px;cursor:pointer;padding:0 2px;line-height:1}
+.near-head button:hover{color:var(--text)}
+.near-list{overflow-y:auto;padding:4px}
+.near-item{display:flex;align-items:center;gap:8px;width:100%;padding:7px 8px;border:none;background:transparent;color:var(--text);text-align:left;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit}
+.near-item:hover{background:var(--panel2)}
+.near-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.near-name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.2px}
+.near-dist{font-size:10.5px;color:var(--dim);font-variant-numeric:tabular-nums;flex-shrink:0}
+.toast{position:absolute;left:50%;top:14px;transform:translate(-50%,-8px);background:var(--panel);border:1px solid var(--border);color:var(--text);font-size:12px;padding:8px 14px;border-radius:8px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.25s;z-index:24;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:860px){.map-credit{right:10px;bottom:calc(46px + env(safe-area-inset-bottom));font-size:8px}}.district-label{fill:var(--map-label);text-anchor:middle;dominant-baseline:central;pointer-events:none;letter-spacing:.6px;paint-order:stroke;stroke:var(--map-bg);stroke-linejoin:round}
 
 /* Points */
 .pt{cursor:pointer;transition:opacity .2s}
@@ -166,6 +191,10 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
 .meta-row span:first-child{color:var(--dim);letter-spacing:.3px}
 .meta-row span:last-child{font-variant-numeric:tabular-nums;letter-spacing:.2px;text-align:right}
 .drawer-foot{padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0}
+.amap-row{display:flex;gap:8px;margin-top:8px}
+.amap-row a{flex:1;height:34px;line-height:32px;text-align:center;border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);text-decoration:none;letter-spacing:.3px;transition:.18s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.amap-row a:hover{border-color:var(--accent);color:var(--accent)}
+.amap-row a.primary{border-color:var(--accent);color:var(--accent);background:rgba(200,169,106,.10)}
 
 /* Mobile */
 #overlay{display:none}
@@ -189,6 +218,8 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
   #overlay{display:block;position:absolute;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .3s;z-index:40}
   #overlay.show{opacity:1;pointer-events:auto}
   .map-badge{left:10px;bottom:calc(10px + env(safe-area-inset-bottom));font-size:10px;padding:5px 10px}
+  .geo-btn{right:10px;top:10px;bottom:auto;width:44px;height:44px}
+  .near-card{left:10px;right:10px;width:auto;bottom:calc(56px + env(safe-area-inset-bottom));max-height:38vh}
 }
 </style>
 </head>
@@ -238,6 +269,19 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
       <div class="src" id="badgeSrc">底图加载中…</div>
     </div>
     <div class="map-credit">路网 / 水系 © OpenStreetMap contributors</div>
+    <button id="geoBtn" class="geo-btn" aria-label="我的位置" title="我的位置">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+        <circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v3M12 18.8v3M2.2 12h3M18.8 12h3"/>
+      </svg>
+    </button>
+    <div id="nearCard" class="near-card" hidden>
+      <div class="near-head">
+        <span><span data-zh="附近项目" data-en="Nearby">附近项目</span> <b id="nearAcc"></b></span>
+        <button id="nearClose" aria-label="关闭">✕</button>
+      </div>
+      <div id="nearList" class="near-list"></div>
+    </div>
+    <div id="toast" class="toast"></div>
   </div>
 
   <aside id="drawer">
@@ -256,10 +300,15 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
         <div class="meta-row"><span data-zh="坐标" data-en="Coordinates">坐标</span><span id="dCoord"></span></div>
         <div class="meta-row"><span data-zh="定位精度" data-en="Accuracy">定位精度</span><span id="dAcc"></span></div>
         <div class="meta-row" id="dOutRow" style="display:none"><span data-zh="市域范围" data-en="City limits">市域范围</span><span data-zh="市域外（邻近地区）" data-en="Outside city limits">市域外（邻近地区）</span></div>
+        <div class="meta-row" id="dDistRow" style="display:none"><span data-zh="距我" data-en="Distance">距我</span><span id="dDist"></span></div>
       </div>
     </div>
     <div class="drawer-foot">
       <button id="btnLocate" style="width:100%;height:38px;border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:8px;font-size:12.5px;cursor:pointer;letter-spacing:.5px" data-zh="在地图上居中" data-en="Center on Map">在地图上居中</button>
+      <div class="amap-row">
+        <a id="amapView" href="#" target="_blank" rel="noopener" data-zh="高德地图查看" data-en="View on Amap">高德地图查看</a>
+        <a id="amapNav" class="primary" href="#" target="_blank" rel="noopener" data-zh="导航到这里" data-en="Navigate">导航到这里</a>
+      </div>
     </div>
   </aside>
   <div id="overlay"></div>
@@ -460,7 +509,8 @@ const gOutline=el('g',{id:'outlineLayer'});
 const gLabels=el('g',{id:'labelLayer'});
 const gRoute=el('g',{id:'routeLayer'});
 const gPts=el('g',{id:'ptLayer'});
-[gFill,gWaterSmall,gWater,gWaterLine,gCanals,gInner,gRoadLocal,gRoadMain,gOutline,gLabels,gRoute,gPts]
+const gMe=el('g',{id:'meLayer'});
+[gFill,gWaterSmall,gWater,gWaterLine,gCanals,gInner,gRoadLocal,gRoadMain,gOutline,gLabels,gRoute,gPts,gMe]
   .forEach(g=>svg.appendChild(g));
 
 /* --- 几何工具 --- */
@@ -834,6 +884,7 @@ function updateScales(){
     it.node.style.display=(clash||off)?'none':'';
     if(!clash&&!off)placed.push({px,py,w});
   });
+  updateMe();
 }
 
 /* ========== 8. 点位与路线 ========== */
@@ -993,6 +1044,15 @@ function selectPoint(no,fly){
   document.getElementById('dCoord').textContent=p.lat.toFixed(4)+', '+p.lon.toFixed(4);
   document.getElementById('dAcc').textContent=p.approx?(S.lang==='zh'?'片区近似位置':'Approximate district location'):(S.lang==='zh'?'精确 / 地址匹配':'Precise / Address matched');
   document.getElementById('dOutRow').style.display=p.outside?'flex':'none';
+  const distRow=document.getElementById('dDistRow');
+  if(myPos){
+    document.getElementById('dDist').textContent=fmtDist(haversine(myPos.lat,myPos.lon,p.lat,p.lon));
+    distRow.style.display='flex';
+  }else{
+    distRow.style.display='none';
+  }
+  document.getElementById('amapView').href=amapMarker(p);
+  document.getElementById('amapNav').href=amapNavUrl(p);
   const img=document.getElementById('dImg');
   img.innerHTML=p.img?('<img src="'+p.img+'" alt="">'):lineIcon(cat.color);
   drawer.classList.add('open');
@@ -1094,6 +1154,14 @@ svg.addEventListener('wheel',e=>{
 },{passive:false});
 svg.addEventListener('click',e=>{
   if(dragMoved)return;
+  if(pickMode){
+    const r=svg.getBoundingClientRect();
+    const lon=CX+(S.vb[0]+(e.clientX-r.left)/r.width*S.vb[2])/KX;
+    const lat=CY-(S.vb[1]+(e.clientY-r.top)/r.height*S.vb[3])/KY;
+    setPos(lon,lat,null,true);
+    exitPick();
+    return;
+  }
   const g=e.target.closest?e.target.closest('.pt'):null;
   if(g)selectPoint(+g.dataset.id,false);
 });
@@ -1129,7 +1197,196 @@ function scheduleViewRefresh(){
   },140);
 }
 
-/* ========== 13. 顶部按钮 ========== */
+/* ========== 13. 我的位置 ========== */
+/* 浏览器 Geolocation 返回 WGS-84，而本图底图与点位是 GCJ-02（高德系），
+   不转换会出现 300–500 m 的系统性偏移。 */
+const PI=Math.PI, GCJ_A=6378245.0, GCJ_EE=0.00669342162296594323;
+function _tLat(x,y){
+  let r=-100+2*x+3*y+0.2*y*y+0.1*x*y+0.2*Math.sqrt(Math.abs(x));
+  r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;
+  r+=(20*Math.sin(y*PI)+40*Math.sin(y/3*PI))*2/3;
+  r+=(160*Math.sin(y/12*PI)+320*Math.sin(y*PI/30))*2/3;
+  return r;
+}
+function _tLon(x,y){
+  let r=300+x+2*y+0.1*x*x+0.1*x*y+0.1*Math.sqrt(Math.abs(x));
+  r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;
+  r+=(20*Math.sin(x*PI)+40*Math.sin(x/3*PI))*2/3;
+  r+=(150*Math.sin(x/12*PI)+300*Math.sin(x/30*PI))*2/3;
+  return r;
+}
+function wgs2gcj(lon,lat){
+  const dLat0=_tLat(lon-105,lat-35), dLon0=_tLon(lon-105,lat-35);
+  const radLat=lat/180*PI;
+  let magic=Math.sin(radLat); magic=1-GCJ_EE*magic*magic;
+  const sq=Math.sqrt(magic);
+  const dLat=(dLat0*180)/((GCJ_A*(1-GCJ_EE))/(magic*sq)*PI);
+  const dLon=(dLon0*180)/(GCJ_A/sq*Math.cos(radLat)*PI);
+  return [lon+dLon,lat+dLat];
+}
+function haversine(lat1,lon1,lat2,lon2){
+  const R=6371000,dLat=(lat2-lat1)*PI/180,dLon=(lon2-lon1)*PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*PI/180)*Math.cos(lat2*PI/180)*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));
+}
+function fmtDist(m){return m<1000?Math.round(m)+' m':(m<10000?(m/1000).toFixed(1):Math.round(m/1000))+' km';}
+
+let myPos=null, meEls=null, geoWatch=null, lastFixAt=0;
+const geoBtn=document.getElementById('geoBtn');
+const nearCard=document.getElementById('nearCard');
+const nearList=document.getElementById('nearList');
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),3600);
+}
+function drawMe(){
+  gMe.innerHTML='';meEls=null;
+  if(!myPos)return;
+  const x=wx(myPos.lon),y=wy(myPos.lat);
+  const acc=el('circle',{class:'me-acc',cx:x,cy:y});
+  const pulse=el('circle',{class:'me-pulse',cx:x,cy:y,fill:'#3D8BFD'});
+  const ring=el('circle',{class:'me-ring',cx:x,cy:y,fill:'#FFFFFF'});
+  const dot=el('circle',{class:'me-dot',cx:x,cy:y,fill:'#3D8BFD'});
+  [acc,pulse,ring,dot].forEach(n=>gMe.appendChild(n));
+  meEls={acc,pulse,ring,dot};
+  updateMe();
+}
+function updateMe(){
+  if(!meEls||!myPos)return;
+  const u=S.u;
+  meEls.acc.setAttribute('r',((myPos.acc||30)/95.4).toFixed(2));
+  meEls.pulse.setAttribute('r',(u*9).toFixed(1));
+  meEls.ring.setAttribute('r',(u*8.5).toFixed(1));
+  meEls.dot.setAttribute('r',(u*5.5).toFixed(1));
+}
+function nearestItems(n){
+  const arr=POINTS.map(p=>({p,d:haversine(myPos.lat,myPos.lon,p.lat,p.lon)}));
+  arr.sort((a,b)=>a.d-b.d);
+  return arr.slice(0,n||5);
+}
+function renderNear(){
+  if(!myPos){nearCard.hidden=true;return;}
+  nearCard.hidden=false;
+  document.getElementById('nearAcc').textContent=myPos.manual
+    ?(S.lang==='zh'?'手动选点':'Manual')
+    :(myPos.acc?('±'+Math.round(myPos.acc)+' m'):'');
+  nearList.innerHTML=nearestItems(5).map(it=>{
+    const cat=CATS[it.p.cat];
+    const name=(S.lang==='zh'?it.p.zh:it.p.en).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+    return '<button class="near-item" data-no="'+it.p.no+'">'+
+      '<span class="near-dot" style="background:'+cat.color+'"></span>'+
+      '<span class="near-name">'+name+'</span>'+
+      '<span class="near-dist">'+fmtDist(it.d)+'</span></button>';
+  }).join('');
+  nearList.querySelectorAll('.near-item').forEach(b=>{
+    b.onclick=()=>{selectPoint(+b.dataset.no,true);};
+  });
+}
+function setPos(lon,lat,acc,manual){
+  const moved=!myPos||haversine(myPos.lat,myPos.lon,lat,lon)>8;
+  myPos={lon,lat,acc:acc==null?null:acc,manual:!!manual,at:Date.now()};
+  myPos.inCity=!!S.base&&S.base.outer.some(r=>pointInRing(lon,lat,r));
+  lastFixAt=Date.now();
+  drawMe();
+  renderNear();
+  if(moved){
+    if(myPos.inCity)flyToMe();
+    else toast(S.lang==='zh'?'你不在成都市域内，已按距离列出最近的项目':'You are outside Chengdu; nearest projects listed');
+  }
+}
+function applyFix(pos){
+  const c=pos.coords;
+  const g=wgs2gcj(c.longitude,c.latitude);
+  setPos(g[0],g[1],c.accuracy||30,false);
+}
+function flyToMe(){
+  const span=Math.max(0.03,(myPos.acc||40)*5/95000);
+  animateVB(fitAspect(vbOf({
+    lon0:myPos.lon-span/2,lon1:myPos.lon+span/2,
+    lat0:myPos.lat-span/2*1.15,lat1:myPos.lat+span/2*1.15
+  })));
+}
+let pickMode=false;
+function enterPick(){
+  pickMode=true;
+  geoBtn.classList.add('on');
+  svg.classList.add('picking');
+  toast(S.lang==='zh'?'点击地图上的位置，设为“我的位置”':'Tap the map to set your location');
+}
+function exitPick(){
+  pickMode=false;
+  geoBtn.classList.remove('on');
+  svg.classList.remove('picking');
+}
+function startLocate(){
+  if(!window.isSecureContext){
+    toast(S.lang==='zh'?'当前页面不是 HTTPS，无法调用设备定位，已改为手动选点':'Not HTTPS — manual pick instead');
+    enterPick();
+    return;
+  }
+  if(!navigator.geolocation){
+    toast(S.lang==='zh'?'当前浏览器不支持设备定位，已改为手动选点':'Geolocation unsupported — manual pick');
+    enterPick();
+    return;
+  }
+  geoBtn.classList.add('loading');
+  navigator.geolocation.getCurrentPosition(
+    pos=>{geoBtn.classList.remove('loading');geoBtn.classList.add('on');applyFix(pos);watchMe();},
+    err=>{
+      geoBtn.classList.remove('loading');
+      toast(errMsg(err));
+      if(!err||err.code!==1)enterPick();
+    },
+    {enableHighAccuracy:true,timeout:8000,maximumAge:0}
+  );
+}
+function watchMe(){
+  if(geoWatch!==null)return;
+  try{
+    geoWatch=navigator.geolocation.watchPosition(
+      pos=>{if(Date.now()-lastFixAt>2500)applyFix(pos);},
+      ()=>{},
+      {enableHighAccuracy:true,maximumAge:5000,timeout:20000}
+    );
+  }catch(e){}
+}
+function stopLocate(){
+  if(geoWatch!==null){try{navigator.geolocation.clearWatch(geoWatch);}catch(e){}geoWatch=null;}
+  myPos=null;drawMe();nearCard.hidden=true;
+  geoBtn.classList.remove('on','loading');
+  gMe.innerHTML='';
+  exitPick();
+}
+function errMsg(err){
+  const L=S.lang==='zh';
+  if(err&&err.code===1)return L?'已拒绝定位权限，可在浏览器设置里重新允许':'Location permission denied';
+  if(err&&err.code===3)return L?'定位超时，请开启 GPS 或到室外重试':'Location request timed out';
+  return L?'无法获取位置（定位服务可能被关闭）':'Position unavailable';
+}
+geoBtn.onclick=()=>{
+  if(pickMode){exitPick();return;}
+  if(myPos){stopLocate();return;}
+  startLocate();
+};
+document.getElementById('nearClose').onclick=()=>{stopLocate();};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&pickMode)exitPick();});
+
+/* 高德地图链接：坐标本就是 GCJ-02，直接以 coordinate=gaode 传入 */
+function isMobileUA(){return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||'');}
+function amapMarker(p){
+  return 'https://uri.amap.com/marker?position='+p.lon.toFixed(6)+','+p.lat.toFixed(6)+
+    '&name='+encodeURIComponent(p.zh)+'&src=chengdu-sample&coordinate=gaode&callnative='+(isMobileUA()?1:0);
+}
+function amapNavUrl(p){
+  let u='https://uri.amap.com/navigation?to='+p.lon.toFixed(6)+','+p.lat.toFixed(6)+','+encodeURIComponent(p.zh)+
+    '&mode=car&policy=1&src=chengdu-sample&coordinate=gaode&callnative='+(isMobileUA()?1:0);
+  if(myPos)u+='&from='+myPos.lon.toFixed(6)+','+myPos.lat.toFixed(6)+','+encodeURIComponent(S.lang==='zh'?'我的位置':'My location');
+  return u;
+}
+
+/* ========== 14. 顶部按钮 ========== */
 document.getElementById('btnTheme').onclick=()=>{
   S.theme=S.theme==='dark'?'light':'dark';
   document.documentElement.dataset.theme=S.theme;
@@ -1164,7 +1421,7 @@ document.getElementById('btnSearch').onclick=()=>{
   else{inp.value='';inp.dispatchEvent(new Event('input'));}
 };
 
-/* ========== 14. 语言 ========== */
+/* ========== 15. 语言 ========== */
 function applyLang(){
   document.getElementById('mainTitle').textContent=S.lang==='zh'
     ?'成都样本：一座公园城市的项目轨迹'
@@ -1179,9 +1436,10 @@ function applyLang(){
   document.getElementById('btnView').textContent=S.view==='city'
     ?(S.lang==='zh'?'全域':'All')
     :(S.lang==='zh'?'主城':'City');
+  if(myPos)renderNear();
 }
 
-/* ========== 15. 初始化 ========== */
+/* ========== 16. 初始化 ========== */
 function init(){
   renderLegend();
   renderRoutesList();
