@@ -1525,7 +1525,7 @@ document.getElementById('btnExport').onclick=async()=>{
       src=src.replace(/const RAW=\[[\s\S]*?\n\];/,()=>rawLit);
     }
     const put=(html,id,obj)=>{
-      const re=new RegExp('(<script type="application/json" id="'+id+'">)[\\s\\S]*?(</script>)');
+      const re=new RegExp('(<script type="application/json" id="'+id+'">)[\\s\\S]*?(<\\/script>)');
       if(!re.test(html))throw new Error(id+' missing');
       return html.replace(re,(m,a,b)=>a+JSON.stringify(obj)+b);
     };
@@ -2176,7 +2176,7 @@ function applyLang(){
 }
 
 /* ========== 15.5 版本与自检 ========== */
-const BUILD='2026-11-16 19:40';
+const BUILD='2026-11-17 11:05';
 window.__CD_BUILD=BUILD;
 let lastError='';
 window.addEventListener('error',e=>{
