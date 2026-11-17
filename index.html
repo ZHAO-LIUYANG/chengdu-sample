@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="成都样本">
 <meta name="format-detection" content="telephone=no">
 <title>成都样本 · The Chengdu Sample</title>
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAIAAADTED8xAAADt0lEQVR42u3YQUrrQBzA4cxkQNwVAnqH7j2DB/AWeoviFXTpFbyMuuoVhO5Emsy8RR6l+Iy8B4kvku9blRbq32l/mUxDKaWCpYqWAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAAEAACAAEAAIAAYAAQAAgABAACAAEAAIAAYAAQAAgABAACAAEAAIAAYAAQAAgABAACAAEAAIAAYAAQAAgABAACAAEAAIAAYAAQAAgABAACAAEAP8kTfruOeecs1Wu6zqE8OfzpZSu62Y+fAihruv/NfzQ0o3235VSfEGxA4x/7Y8xPj09PT4+xhgXvg9cX183TVNKOVzM+sevr6/39/fzvT+OMee8Xq+vrq76D/R4+N1ud3d3l3MOYfzLaP+eMcabm5vVanW8dCMr09jv96WUh4cH15iqql5eXvobhsP69I+fn5/nP/zl5eXhAz0efrvdfsNf3263H5ZuXNOeAU5PT1NKKaW2bRe9z6Y09PzQSzMZu23b1Wo1dHd+cnLSdd10O0Bd158eP37SIbj/6i88gKHvRyll5ivTtu3QSbcfftIAen4GBQGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAABAACAAEAAIAAYAAQAAgABAACAAEAAIAAYAAQAAgABAACAAEAAIAAYAAQAAgABAACAAEAAIAAYAAQAAgABAACAAEAAKAMaVp84oxpZRSWvgqhxCGnp/z4vSz1XX9xfAhhBBCKWX0FSul1HU9tHQ/I4C3t7e2bdu2XXgAQysw88XpZ9vtdp++2nXd+/v71AN0XfcjA4gxVlV1cXGx2WxijDnnJQdwdnb2YR/oH5+fn282m/neH8eYc16v14cP9Hj4pmlub29zztPtADHGpmm+2EJH+EOjjw7OAL/lnBd+7e8N3cuWUqbe4ke5GH96DPie4ac+BtgBqPwMCgIAAYAAQAAgABAACAAEAAIAAYAAQAAgABAACAAEAAIAAYAAQAAgABAACAAEAAIAAYAAQAAgABAACAAEAAIAAYAAQAAgABAACAAEAAIAAYAAQAAgABAACAAEAAIAASAAEAAIAAQAAgABgABAACAAEAAIAAQAAgABgABAACAAEAAIAAQAAgABgABAACAAEAAIAAQAAgABgABAACAAEAAIAAQAAgABgABAACAAEAAIAP7WL86t0HTCi1mGAAAAAElFTkSuQmCC">
 <style>
 :root{
@@ -105,6 +106,15 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
 .proj-name{font-size:12.5px;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .approx-mark{color:var(--dim);font-size:10px;margin-left:5px;letter-spacing:0}
 .legend-note{margin-top:9px;font-size:10px;line-height:1.5;color:var(--dim);letter-spacing:.2px;opacity:.85}
+.arch-sel{margin-top:10px;width:100%;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--panel2);color:var(--text);font-size:11.5px;font-family:inherit;padding:0 8px;outline:none}
+.arch-sel:focus{border-color:var(--accent)}
+.title-tools{display:flex;align-items:center;gap:6px}
+.mini-btn{height:20px;padding:0 7px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--dim);font-size:9.5px;letter-spacing:.2px;cursor:pointer;font-family:inherit;transition:.15s}
+.mini-btn:hover{border-color:var(--accent);color:var(--accent)}
+.mini-btn.on{border-color:var(--accent);color:var(--accent);background:rgba(200,169,106,.12)}
+.drawer-fav{position:absolute;top:14px;right:50px;width:28px;height:28px;border:none;background:var(--panel2);color:var(--dim);border-radius:50%;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;transition:.18s}
+.drawer-fav:hover{background:var(--border);color:var(--text)}
+.drawer-fav.on{color:var(--accent)}
 .proj-en{font-size:10px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
 .empty{text-align:center;padding:28px 10px;color:var(--dim);font-size:12px}
 
@@ -135,6 +145,17 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
 .geo-btn{position:absolute;right:14px;bottom:44px;width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--panel);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow);z-index:16;transition:.18s;padding:0}
 .geo-btn:hover{border-color:var(--accent);color:var(--accent)}
 .geo-btn.on{border-color:var(--accent);color:var(--accent);background:rgba(200,169,106,.12)}
+.add-btn{right:14px;bottom:96px;font-size:20px;font-weight:300;line-height:1}
+.add-box{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:300px;max-width:calc(100% - 32px);max-height:calc(100% - 40px);overflow-y:auto;background:var(--panel);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);z-index:45;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.add-box[hidden]{display:none}
+.add-head{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;letter-spacing:.5px}
+.add-head button{border:none;background:transparent;color:var(--dim);font-size:14px;cursor:pointer}
+.add-box label{display:flex;flex-direction:column;gap:4px;font-size:10.5px;color:var(--dim)}
+.add-box input,.add-box select,.add-box textarea{border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:6px;padding:6px 8px;font-size:12px;font-family:inherit;outline:none;resize:vertical}
+.add-box input:focus,.add-box select:focus,.add-box textarea:focus{border-color:var(--accent)}
+.add-coord{font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
+.danger-link{border:none;background:transparent;color:#E07A5F;font-size:11.5px;cursor:pointer;padding:0;font-family:inherit}
+.danger-link:hover{text-decoration:underline}
 .geo-btn.loading svg{animation:geo-spin 1s linear infinite}
 @keyframes geo-spin{to{transform:rotate(360deg)}}
 .me-acc{fill:rgba(61,139,253,.10);stroke:rgba(61,139,253,.40);stroke-width:1px;vector-effect:non-scaling-stroke}
@@ -156,6 +177,10 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
 .near-dist{font-size:10.5px;color:var(--dim);font-variant-numeric:tabular-nums;flex-shrink:0}
 .toast{position:absolute;left:50%;top:14px;transform:translate(-50%,-8px);background:var(--panel);border:1px solid var(--border);color:var(--text);font-size:12px;padding:8px 14px;border-radius:8px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.25s;z-index:24;max-width:calc(100% - 32px);text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
+.map-scale{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;display:flex;align-items:flex-end;gap:8px;color:var(--dim);font-size:10px;z-index:14;pointer-events:none;letter-spacing:.3px}
+.map-scale .bar{display:block;height:5px;border-left:1px solid currentColor;border-right:1px solid currentColor;border-bottom:1px solid currentColor;min-width:24px}
+.map-scale .north{font-weight:600;opacity:.8}
+#mapWrap.amap-on .map-scale{display:none}
 @media(max-width:860px){.map-credit{right:10px;bottom:calc(46px + env(safe-area-inset-bottom));font-size:8px}}.district-label{fill:var(--map-label);text-anchor:middle;dominant-baseline:central;pointer-events:none;letter-spacing:.6px;paint-order:stroke;stroke:var(--map-bg);stroke-linejoin:round}
 
 /* Points */
@@ -198,7 +223,30 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
 .img-btn.remove{right:auto;left:10px;opacity:.85}
 .export-btn{width:100%;height:36px;border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:8px;font-size:12px;letter-spacing:.4px;cursor:pointer;transition:.18s}
 .export-btn:hover{background:rgba(200,169,106,.12)}
+.export-row{display:flex;gap:8px;margin-top:8px}
+.export-btn.small{flex:1;height:32px;font-size:11.5px;border-color:var(--border);color:var(--text)}
+.export-btn.small:hover{border-color:var(--accent);color:var(--accent);background:transparent}
 .drawer-desc{padding:18px 20px;font-size:13px;line-height:1.75;color:var(--text)}
+.drawer-note{margin:0 20px 14px;padding:10px 12px;border-left:2px solid var(--accent);background:var(--panel2);font-size:12px;line-height:1.7;color:var(--text);border-radius:0 6px 6px 0;white-space:pre-wrap}
+.drawer-tools{display:flex;gap:8px;padding:0 20px 12px;flex-wrap:wrap}
+.drawer-tools .mini-btn{height:28px;padding:0 12px;border-radius:14px;font-size:11.5px}
+.note-edit{padding:0 20px 14px;display:flex;flex-direction:column;gap:8px}
+.note-edit textarea{width:100%;border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:8px;padding:9px 10px;font-size:12px;font-family:inherit;line-height:1.6;resize:vertical;outline:none}
+.note-edit textarea:focus{border-color:var(--accent)}
+.meta-edit{padding:0 20px 14px;font-size:12px;color:var(--dim)}
+.meta-edit summary{cursor:pointer;font-size:11px;letter-spacing:.3px;padding:6px 0}
+.meta-edit summary:hover{color:var(--accent)}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
+.meta-grid input{height:30px;border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:6px;padding:0 8px;font-size:11.5px;font-family:inherit;outline:none;min-width:0}
+.meta-grid input:focus{border-color:var(--accent)}
+.src-link{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(200,169,106,.4);padding-bottom:1px}
+.src-link:hover{border-bottom-color:var(--accent)}
+html.big-text body{font-size:15.5px}
+html.big-text .proj-name{font-size:14px}
+html.big-text .proj-en,html.big-text .legend-name,html.big-text .route-name{font-size:12.5px}
+html.big-text .drawer-desc{font-size:15px;line-height:1.85}
+html.big-text .drawer-title{font-size:21px}
+html.big-text .near-item{font-size:13.5px}
 .drawer-meta{padding:0 20px 18px;display:flex;flex-direction:column;gap:8px}
 .meta-row{display:flex;justify-content:space-between;font-size:11.5px;padding:7px 0;border-bottom:1px solid var(--border)}
 .meta-row span:first-child{color:var(--dim);letter-spacing:.3px}
@@ -232,7 +280,18 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
   #overlay.show{opacity:1;pointer-events:auto}
   .map-badge{left:10px;bottom:calc(10px + env(safe-area-inset-bottom));font-size:10px;padding:5px 10px}
   .geo-btn{right:10px;top:10px;bottom:auto;width:44px;height:44px}
+  .add-btn{right:10px;top:62px;bottom:auto;width:44px;height:44px}
   .near-card{left:10px;right:10px;width:auto;bottom:calc(56px + env(safe-area-inset-bottom));max-height:38vh}
+}
+/* 打印：只输出项目清单 */
+@media print{
+  .topbar,#mapWrap,#drawer,#overlay,.map-badge,.map-credit,.geo-btn,.near-card,.map-scale,.toast{display:none!important}
+  html,body{height:auto;overflow:visible;background:#fff;color:#000}
+  main{display:block;height:auto}
+  #sidebar{width:100%;max-width:none;position:static;transform:none;overflow:visible;border:none;background:#fff}
+  .section{border-color:#ddd;padding:10px 0}
+  .proj-item{break-inside:avoid;color:#000}
+  .proj-en,.legend-count{color:#666}
 }
 </style>
 </head>
@@ -254,7 +313,8 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
     <button id="btnView" data-zh="全域" data-en="All">全域</button>
     <button id="btnLang">EN</button>
     <button id="btnTheme" title="主题">☀</button>
-    <button id="btnList" class="mobile-only">列表</button>
+    <button id="btnBig" title="大字模式" aria-label="大字模式">A</button>
+    <button id="btnList" class="mobile-only" data-zh="列表" data-en="List">列表</button>
   </div>
 </div>
 
@@ -263,6 +323,7 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
     <div class="section">
       <div class="section-title"><span data-zh="维度筛选" data-en="Categories">维度筛选</span><span id="visCount" style="color:var(--accent)"></span></div>
       <div id="legend"></div>
+      <select id="archSel" class="arch-sel" aria-label="按建筑师筛选"><option value="">全部建筑师</option></select>
       <div class="legend-note" data-zh="≈ 表示该点位为片区近似位置，未与高德 POI 逐点核对" data-en="≈ approximate area-level location, not verified against Amap POI">≈ 表示该点位为片区近似位置，未与高德 POI 逐点核对</div>
     </div>
     <div class="section">
@@ -270,12 +331,20 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
       <div id="routes"></div>
     </div>
     <div class="section" style="border-bottom:none">
-      <div class="section-title"><span data-zh="项目列表" data-en="Projects">项目列表</span><span id="listCount" style="font-variant-numeric:tabular-nums"></span></div>
+      <div class="section-title"><span data-zh="项目列表" data-en="Projects">项目列表</span><span class="title-tools"><button id="favOnly" class="mini-btn" data-zh="收藏" data-en="Saved" title="只看收藏">收藏</button><button id="sortDist" class="mini-btn" data-zh="距离" data-en="Distance" title="按距离排序">距离</button><span id="listCount" style="font-variant-numeric:tabular-nums"></span></span></div>
       <div id="list"></div>
     </div>
     <div class="section" style="border-bottom:none">
       <div class="section-title"><span data-zh="项目照片" data-en="Photos">项目照片</span><span id="photoStat" style="color:var(--dim);letter-spacing:0"></span></div>
       <button id="btnExport" class="export-btn" data-zh="导出带图页面" data-en="Export page with photos">导出带图页面</button>
+      <div class="export-row">
+        <button id="btnCSV" class="export-btn small" data-zh="导出 CSV" data-en="CSV">导出 CSV</button>
+        <button id="btnGeo" class="export-btn small" data-zh="导出 GeoJSON" data-en="GeoJSON">导出 GeoJSON</button>
+      </div>
+      <div class="export-row">
+        <button id="btnGPX" class="export-btn small" data-zh="路线 GPX" data-en="Routes GPX">路线 GPX</button>
+        <button id="btnPrint" class="export-btn small" data-zh="打印清单" data-en="Print">打印清单</button>
+      </div>
       <div class="legend-note" data-zh="在项目详情里点「添加照片」；照片先存在本机，点上面按钮导出的 index.html 才会带上图片。" data-en="Add photos inside a project panel; they stay local until you export the page.">在项目详情里点「添加照片」；照片先存在本机，点上面按钮导出的 index.html 才会带上图片。</div>
     </div>
   </aside>
@@ -287,12 +356,23 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
       <div id="badgeCount"></div>
       <div class="src" id="badgeSrc">底图加载中…</div>
     </div>
+    <div class="map-scale" id="scaleBar"><i class="bar"></i><span id="scaleText"></span><b class="north">N↑</b></div>
     <div class="map-credit">路网 / 水系 © OpenStreetMap contributors</div>
     <button id="geoBtn" class="geo-btn" aria-label="我的位置" title="我的位置">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
         <circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v3M12 18.8v3M2.2 12h3M18.8 12h3"/>
       </svg>
     </button>
+    <button id="addPointBtn" class="geo-btn add-btn" aria-label="新增标点" title="新增标点">+</button>
+    <div id="addBox" class="add-box" hidden>
+      <div class="add-head"><span data-zh="新增标点" data-en="New point">新增标点</span><button id="addClose" aria-label="关闭">✕</button></div>
+      <label><span data-zh="中文名" data-en="Chinese name">中文名</span><input id="addZh" maxlength="40"></label>
+      <label><span data-zh="英文名" data-en="English name">英文名</span><input id="addEn" maxlength="60"></label>
+      <label><span data-zh="类别" data-en="Category">类别</span><select id="addCat"></select></label>
+      <label><span data-zh="简介" data-en="Description">简介</span><textarea id="addDz" rows="3" maxlength="200"></textarea></label>
+      <div class="add-coord" id="addCoord"></div>
+      <button id="addSave" class="export-btn" data-zh="保存并显示" data-en="Save point">保存并显示</button>
+    </div>
     <div id="nearCard" class="near-card" hidden>
       <div class="near-head">
         <span><span data-zh="附近项目" data-en="Nearby">附近项目</span> <b id="nearAcc"></b></span>
@@ -306,6 +386,7 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
   <aside id="drawer">
     <div class="drawer-head">
       <button class="drawer-close" id="drawerClose">✕</button>
+      <button class="drawer-fav" id="dFav" aria-label="收藏">☆</button>
       <div class="drawer-cat" id="dCat"></div>
       <div class="drawer-title" id="dTitle"></div>
       <div class="drawer-en" id="dEn"></div>
@@ -314,11 +395,37 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
       <div class="drawer-img" id="dImg"></div>
       <input type="file" id="photoInput" accept="image/*" hidden>
       <div class="drawer-desc" id="dDesc"></div>
+      <div class="drawer-note" id="dNote" hidden></div>
+      <div class="drawer-tools">
+        <button id="btnSpeak" class="mini-btn" data-zh="朗读" data-en="Read aloud">朗读</button>
+        <button id="btn3D" class="mini-btn" data-zh="3D 视角" data-en="3D view">3D 视角</button>
+        <button id="btnNoteEdit" class="mini-btn" data-zh="备注" data-en="Note">备注</button>
+      </div>
+      <div class="note-edit" id="noteEdit" hidden>
+        <textarea id="noteText" rows="3" placeholder="写下你的观察（只存在本机，导出后随页面发布）"></textarea>
+        <button id="noteSave" class="export-btn small" data-zh="保存备注" data-en="Save note">保存备注</button>
+      </div>
+      <details class="meta-edit" id="metaEdit">
+        <summary data-zh="补充 / 修正信息" data-en="Edit details">补充 / 修正信息</summary>
+        <div class="meta-grid">
+          <input id="edArch" placeholder="建筑师">
+          <input id="edYear" placeholder="年代（2021）">
+          <input id="edStatus" placeholder="状态（建成/在建/改造）">
+          <input id="edArea" placeholder="面积（12,000 ㎡）">
+        </div>
+        <button id="edSave" class="export-btn small" data-zh="保存信息" data-en="Save details">保存信息</button>
+      </details>
       <div class="drawer-meta">
         <div class="meta-row"><span data-zh="编号" data-en="No.">编号</span><span id="dNo"></span></div>
         <div class="meta-row"><span data-zh="维度" data-en="Category">维度</span><span id="dCatTxt"></span></div>
         <div class="meta-row"><span data-zh="坐标" data-en="Coordinates">坐标</span><span id="dCoord"></span></div>
         <div class="meta-row"><span data-zh="定位精度" data-en="Accuracy">定位精度</span><span id="dAcc"></span></div>
+        <div class="meta-row" id="mArch" style="display:none"><span data-zh="建筑师" data-en="Architect">建筑师</span><span id="dArch"></span></div>
+        <div class="meta-row" id="mYear" style="display:none"><span data-zh="年代" data-en="Year">年代</span><span id="dYear"></span></div>
+        <div class="meta-row" id="mStatus" style="display:none"><span data-zh="状态" data-en="Status">状态</span><span id="dStatus"></span></div>
+        <div class="meta-row" id="mArea" style="display:none"><span data-zh="面积" data-en="Floor area">面积</span><span id="dArea"></span></div>
+        <div class="meta-row" id="mSrc" style="display:none"><span data-zh="资料来源" data-en="Source">资料来源</span><span><a id="dSrc" class="src-link" target="_blank" rel="noopener" data-zh="查看原文" data-en="Open source">查看原文</a></span></div>
+        <div class="meta-row" id="mDel"><span data-zh="管理" data-en="Manage">管理</span><span><button id="btnDelete" class="danger-link" data-zh="彻底删除此点" data-en="Delete point">彻底删除此点</button></span></div>
         <div class="meta-row" id="dOutRow" style="display:none"><span data-zh="市域范围" data-en="City limits">市域范围</span><span data-zh="市域外（邻近地区）" data-en="Outside city limits">市域外（邻近地区）</span></div>
         <div class="meta-row" id="dDistRow" style="display:none"><span data-zh="距我" data-en="Distance">距我</span><span id="dDist"></span></div>
       </div>
@@ -328,6 +435,7 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
       <div class="amap-row">
         <button type="button" id="amapView" data-zh="高德地图查看" data-en="View on Amap">高德地图查看</button>
         <button type="button" id="amapNav" class="primary" data-zh="导航到这里" data-en="Navigate">导航到这里</button>
+        <button type="button" id="copyLink" data-zh="复制链接" data-en="Copy link">复制链接</button>
       </div>
     </div>
   </aside>
@@ -342,6 +450,10 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
 
 <!-- 项目照片：{ "编号": "data:image/jpeg;base64,..." }，由页面里的“导出带图页面”写入 -->
 <script type="application/json" id="photoStore">{}</script>
+<!-- 用户备注：{ "编号": "文字" } -->
+<script type="application/json" id="noteStore">{}</script>
+<!-- 信息修正：{ "编号": {arch,year,status,area} } -->
+<script type="application/json" id="metaStore">{}</script>
 
 <script>
 /* ========== 1. 分类 ========== */
@@ -469,6 +581,25 @@ const RAW=[
 const POINTS=RAW.map(r=>({no:r[0],zh:r[1],en:r[2],cat:r[3],lat:r[4],lon:r[5],approx:r[6],dz:r[7],de:r[8],img:'',outside:false}));
 const byNo={};POINTS.forEach(p=>byNo[p.no]=p);
 
+/* 本机新增 / 删除的点位 */
+const CUSTOM=(()=>{try{return JSON.parse(localStorage.getItem('cd-custom')||'[]');}catch(e){return[];}})();
+const REMOVED=new Set((()=>{try{return JSON.parse(localStorage.getItem('cd-removed')||'[]');}catch(e){return[];}})());
+for(let i=POINTS.length-1;i>=0;i--){if(REMOVED.has(POINTS[i].no))POINTS.splice(i,1);}
+CUSTOM.forEach(c=>{if(!byNo[c.no])POINTS.push(c);});
+function rebuildIndex(){
+  POINTS.sort((a,b)=>a.no-b.no);
+  Object.keys(byNo).forEach(k=>delete byNo[k]);
+  POINTS.forEach(p=>byNo[p.no]=p);
+}
+rebuildIndex();
+
+/* 项目补充信息：仅收录描述里明确出现的字段，其余留空 */
+const META={"2":{"arch":"","area":"","year":"","status":"改造"},"6":{"arch":"","area":"1,300,000 ㎡","year":"","status":""},"7":{"arch":"","area":"180,000 ㎡","year":"","status":""},"8":{"arch":"","area":"6600 ㎡","year":"","status":""},"9":{"arch":"Sybarite","area":"","year":"","status":""},"12":{"arch":"刘家琨","area":"","year":"","status":""},"13":{"arch":"","area":"","year":"2022","status":"建成"},"14":{"arch":"","area":"54,400 ㎡","year":"","status":""},"17":{"arch":"","area":"","year":"","status":"改造"},"18":{"arch":"","area":"","year":"","status":"改造"},"19":{"arch":"","area":"","year":"","status":"改造"},"21":{"arch":"","area":"","year":"","status":"改造"},"22":{"arch":"","area":"","year":"","status":"改造"},"25":{"arch":"","area":"","year":"","status":"建成"},"36":{"arch":"","area":"","year":"","status":"改造"},"37":{"arch":"","area":"","year":"","status":"改造"},"41":{"arch":"","area":"","year":"","status":"改造"},"42":{"arch":"","area":"","year":"","status":"改造"},"45":{"arch":"扎哈·哈迪德","area":"","year":"","status":""},"46":{"arch":"扎哈","area":"","year":"","status":""},"52":{"arch":"创盟国际","area":"","year":"","status":""},"53":{"arch":"","area":"150,000 ㎡","year":"","status":""},"56":{"arch":"","area":"","year":"","status":"改造"},"57":{"arch":"","area":"","year":"","status":"改造"},"58":{"arch":"","area":"","year":"","status":"改造"},"59":{"arch":"","area":"","year":"","status":"改造"},"60":{"arch":"","area":"","year":"","status":"改造"},"62":{"arch":"IwamotoScott","area":"","year":"2025","status":"建成"},"64":{"arch":"","area":"","year":"2022","status":""},"67":{"arch":"","area":"","year":"","status":"改造"},"69":{"arch":"隈研吾","area":"","year":"","status":""},"70":{"arch":"AND Studio","area":"","year":"","status":""},"71":{"arch":"some + office fuli","area":"40 ㎡","year":"","status":""},"73":{"arch":"","area":"","year":"","status":"改造"},"74":{"arch":"中建西南院","area":"","year":"","status":"改造"},"75":{"arch":"Atelier Meadow筑甸","area":"","year":"","status":"改造"},"76":{"arch":"MAT超级","area":"78 ㎡","year":"","status":""},"79":{"arch":"BDD布道","area":"12,000 ㎡","year":"","status":""},"80":{"arch":"","area":"198,000 ㎡","year":"","status":""},"82":{"arch":"Aedas","area":"180,000 ㎡","year":"","status":""},"83":{"arch":"LLA","area":"150,000 ㎡","year":"","status":""},"84":{"arch":"","area":"350,000 ㎡","year":"","status":""},"85":{"arch":"","area":"30,605 ㎡","year":"","status":""},"87":{"arch":"小型办公空间室内","area":"120 ㎡","year":"","status":""},"89":{"arch":"","area":"585 ㎡","year":"","status":""},"90":{"arch":"Some Thoughts空间设计工作室","area":"240 ㎡","year":"","status":""},"91":{"arch":"F.O.G.","area":"","year":"","status":""},"92":{"arch":"吾和","area":"13,350 ㎡","year":"","status":""},"93":{"arch":"","area":"20,000 ㎡","year":"","status":""},"94":{"arch":"OAD","area":"3,000 ㎡","year":"","status":"改造"},"95":{"arch":"","area":"235 ㎡","year":"","status":"改造"},"97":{"arch":"胜景几何中心","area":"69,874 ㎡","year":"","status":""},"98":{"arch":"","area":"7,682 ㎡","year":"","status":""},"99":{"arch":"胜景几何中心","area":"2,877 ㎡","year":"","status":""},"101":{"arch":"麦稞文化","area":"","year":"","status":""},"102":{"arch":"中国电建华东院林再国工作室","area":"490 ㎡","year":"","status":""},"103":{"arch":"unarchitecte","area":"","year":"","status":""},"105":{"arch":"","area":"6,776 ㎡","year":"2024","status":""},"106":{"arch":"","area":"37,907 ㎡","year":"","status":""}};
+
+/* 已查证数据（含来源） */
+const METAV={"14":{"arch":"中国建筑西南设计研究院","year":"2023","status":"建成","area":"5.44 万㎡","src":"https://www.archdaily.cn/cn/1006667/san-xing-dui-bo-wu-guan-xin-guan-zhong-guo-jian-zhu-xi-nan-she-ji-yan-jiu-yuan"},"15":{"arch":"","year":"2022","status":"建成","area":"50,520 ㎡","src":"http://sc.people.com.cn/n2/2022/0616/c379471-35317211.html"},"16":{"arch":"扎哈·哈迪德建筑事务所","year":"2023","status":"建成","area":"5.9 万㎡","src":"http://zw.china.com.cn/2023-10/16/content_116749443.shtml"},"27":{"arch":"中国建筑西南设计研究院（天府美术馆）","src":"https://ipark.archiposition.com/items/71382578ed"},"34":{"arch":"Benoy 贝诺（商业裙楼/室内），塔楼 KPF","year":"2014","status":"建成","area":"436,300 ㎡（Benoy 设计范围）","src":"https://www.benoy.com/zh-hans/projects/%e6%88%90%e9%83%bd%e5%9b%bd%e9%99%85%e9%87%91%e8%9e%8d%e4%b8%ad%e5%bf%83ifs"},"44":{"arch":"中国建筑西南设计研究院","year":"2019","status":"建成","area":"10.2 万㎡","src":"https://xnjz.cscec.com/xwzx/xwkx/201901/3010167.html"}};
+for(const k in METAV)META[k]=Object.assign({},META[k]||{},METAV[k]);
+
 /* ========== 3. 路线 ========== */
 const ROUTES=[
   {id:'A',color:'#E07A5F',zh:'少城—宽窄文化线',en:'Shaocheng–Kuanzhai Culture Line',sub_zh:'半日 · 步行',sub_en:'Half-day · Walk',pts:[19,17,55,24,59,44]},
@@ -495,6 +626,7 @@ function vbOf(v){return [wx(v.lon0),wy(v.lat1),wx(v.lon1)-wx(v.lon0),wy(v.lat0)-
 const S={
   theme:'dark',lang:'zh',view:'all',
   hidden:new Set(),routeOn:null,activeId:null,query:'',
+  arch:'',favOnly:false,sortDist:false,
   vb:vbOf(VIEWS.all),u:1,base:null
 };
 const labelItems=[];
@@ -883,6 +1015,7 @@ function initAmap(){
   amap.on('moveend',()=>{renderList();updateCounts();});
   amap.on('zoomend',()=>{renderList();updateCounts();});
   amap.on('click',e=>{
+    if(addMode){openAddForm(e.lnglat.getLng(),e.lnglat.getLat());return;}
     if(!pickMode)return;
     setPos(e.lnglat.getLng(),e.lnglat.getLat(),null,true);
     exitPick();
@@ -1031,14 +1164,18 @@ function updateScales(){
     if(!clash&&!off)placed.push({px,py,w});
   });
   updateMe();
+  updateScaleBar();
 }
 
 /* ========== 8. 点位与路线 ========== */
 function ptVisible(p){
   if(S.hidden.has(p.cat))return false;
+  if(S.favOnly&&!FAVS.has(p.no))return false;
+  if(S.arch&&((META[p.no]||{}).arch!==S.arch))return false;
   if(S.query){
     const q=S.query.toLowerCase();
-    if(!(p.zh.toLowerCase().includes(q)||p.en.toLowerCase().includes(q)||String(p.no)===q))return false;
+    const arch=((META[p.no]||{}).arch||'').toLowerCase();
+    if(!(p.zh.toLowerCase().includes(q)||p.en.toLowerCase().includes(q)||arch.includes(q)||String(p.no)===q))return false;
   }
   return true;
 }
@@ -1137,7 +1274,12 @@ function renderList(){
     box.innerHTML='<div class="empty">'+(S.lang==='zh'?'当前视图无匹配项目':'No matching projects in current view')+'</div>';
     return;
   }
-  arr.sort((a,b)=>a.no-b.no).forEach(p=>{
+  if(S.sortDist&&myPos){
+    arr.sort((a,b)=>haversine(myPos.lat,myPos.lon,a.lat,a.lon)-haversine(myPos.lat,myPos.lon,b.lat,b.lon));
+  }else{
+    arr.sort((a,b)=>a.no-b.no);
+  }
+  arr.forEach(p=>{
     const d=document.createElement('div');
     d.className='proj-item'+(S.activeId===p.no?' active':'');
     d.innerHTML='<div class="proj-num">'+String(p.no).padStart(2,'0')+'</div>'+
@@ -1182,6 +1324,7 @@ function lineIcon(catColor){
 function selectPoint(no,fly){
   const p=byNo[no];if(!p)return;
   S.activeId=no;
+  setHash(no);
   renderPoints();
   renderList();
   const cat=CATS[p.cat];
@@ -1200,6 +1343,25 @@ function selectPoint(no,fly){
     ?(S.lang==='zh'?'片区近似（未逐点核对）':'Approximate (area-level)')
     :(S.lang==='zh'?'已按高德 POI 校准':'Verified against Amap POI');
   accEl.style.color=p.approx?'var(--accent)':'';
+  const mm=META[p.no]||{};
+  [['mArch','dArch',mm.arch],['mYear','dYear',mm.year],['mStatus','dStatus',mm.status],['mArea','dArea',mm.area]].forEach(([row,val,v])=>{
+    const rowEl=document.getElementById(row);
+    if(!rowEl)return;
+    rowEl.style.display=v?'flex':'none';
+    if(v)document.getElementById(val).textContent=v;
+  });
+  const favBtn=document.getElementById('dFav');
+  const srcRow=document.getElementById('mSrc');
+  if(mm.src){srcRow.style.display='flex';document.getElementById('dSrc').href=mm.src;}
+  else srcRow.style.display='none';
+  favBtn.textContent=FAVS.has(p.no)?'★':'☆';
+  favBtn.classList.toggle('on',FAVS.has(p.no));
+  renderNote(p);
+  document.getElementById('noteEdit').hidden=true;
+  document.getElementById('edArch').value=mm.arch||'';
+  document.getElementById('edYear').value=mm.year||'';
+  document.getElementById('edStatus').value=mm.status||'';
+  document.getElementById('edArea').value=mm.area||'';
   document.getElementById('dOutRow').style.display=p.outside?'flex':'none';
   const distRow=document.getElementById('dDistRow');
   if(myPos){
@@ -1230,6 +1392,7 @@ function closeDrawer(){
   drawer.classList.remove('open');
   document.getElementById('overlay').classList.remove('show');
   S.activeId=null;
+  setHash(null);
   renderPoints();
   renderList();
 }
@@ -1345,18 +1508,30 @@ document.getElementById('photoInput').addEventListener('change',async e=>{
   }
 });
 document.getElementById('btnExport').onclick=async()=>{
-  if(!Object.keys(PHOTOS).length){
-    toast(S.lang==='zh'?'还没有照片，先在项目详情里添加':'No photos yet');
+  const hasAny=Object.keys(PHOTOS).length||Object.keys(NOTES).length||Object.keys(METAEDIT).length||CUSTOM.length||REMOVED.size;
+  if(!hasAny){
+    toast(S.lang==='zh'?'还没有照片或备注，先在项目详情里添加':'Nothing to export yet');
     return;
   }
   try{
     const res=await fetch(location.href,{cache:'no-store'});
     if(!res.ok)throw new Error('HTTP '+res.status);
     let src=await res.text();
-    const re=/(<script type="application\/json" id="photoStore">)[\s\S]*?(<\/script>)/;
-    if(!re.test(src))throw new Error('photoStore missing');
-    const json=JSON.stringify(PHOTOS);
-    src=src.replace(re,(m,a,b)=>a+json+b);
+    /* 点位发生变化（新增/删除）时重写 RAW */
+    if(CUSTOM.length||REMOVED.size){
+      const rows=POINTS.map(p=>[p.no,p.zh,p.en,p.cat,p.lat,p.lon,p.approx?1:0,p.dz||'',p.de||'']);
+      const rawLit='const RAW=[\n'+rows.map(r=>JSON.stringify(r)).join(',\n')+'\n];';
+      if(!/const RAW=\[[\s\S]*?\n\];/.test(src))throw new Error('RAW missing');
+      src=src.replace(/const RAW=\[[\s\S]*?\n\];/,()=>rawLit);
+    }
+    const put=(html,id,obj)=>{
+      const re=new RegExp('(<script type="application/json" id="'+id+'">)[\\s\\S]*?(</script>)');
+      if(!re.test(html))throw new Error(id+' missing');
+      return html.replace(re,(m,a,b)=>a+JSON.stringify(obj)+b);
+    };
+    src=put(src,'photoStore',PHOTOS);
+    src=put(src,'noteStore',NOTES);
+    src=put(src,'metaStore',METAEDIT);
     const blob=new Blob([src],{type:'text/html;charset=utf-8'});
     const a=document.createElement('a');
     a.href=URL.createObjectURL(blob);
@@ -1368,6 +1543,273 @@ document.getElementById('btnExport').onclick=async()=>{
     console.warn(err);
     toast(S.lang==='zh'?'导出失败：请用 https 或 localhost 打开本页':'Export failed — open via https/localhost');
   }
+};
+
+/* ========== 11.6 深链 / 分享 / 数据导出 / 比例尺 ========== */
+function applyHash(){
+  if(typeof location==='undefined')return;
+  const m=(location.hash||'').match(/^#(\d{1,3})$/);
+  if(m&&byNo[+m[1]])selectPoint(+m[1],true);
+}
+function setHash(no){
+  try{history.replaceState(null,'',no?('#'+no):(location.pathname+location.search));}catch(e){}
+}
+document.getElementById('copyLink').onclick=()=>{
+  const p=byNo[S.activeId];
+  if(!p)return;
+  const url=location.origin+location.pathname+'#'+p.no;
+  try{navigator.clipboard&&navigator.clipboard.writeText(url);}catch(e){}
+  toast(S.lang==='zh'?'链接已复制：可在微信/邮件里直接分享':'Link copied');
+};
+document.getElementById('dCoord').onclick=()=>{
+  const p=byNo[S.activeId];
+  if(!p)return;
+  const text=p.lat.toFixed(6)+', '+p.lon.toFixed(6);
+  try{navigator.clipboard&&navigator.clipboard.writeText(text);}catch(e){}
+  toast((S.lang==='zh'?'坐标已复制：':'Copied: ')+text);
+};
+
+function downloadFile(name,text,type){
+  const blob=new Blob([text],{type:type||'text/plain;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=name;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),6000);
+}
+const csvCell=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+document.getElementById('btnCSV').onclick=()=>{
+  const head=['no','zh','en','cat','lat','lon','precision'];
+  const rows=POINTS.map(p=>[p.no,p.zh,p.en,p.cat,p.lat,p.lon,p.approx?'approx':'verified'].map(csvCell).join(','));
+  downloadFile('chengdu-projects.csv','\ufeff'+head.join(',')+'\n'+rows.join('\n'),'text/csv;charset=utf-8');
+  toast(S.lang==='zh'?'CSV 已导出（106 条）':'CSV exported');
+};
+document.getElementById('btnGeo').onclick=()=>{
+  const gj={
+    type:'FeatureCollection',
+    features:POINTS.map(p=>({
+      type:'Feature',
+      geometry:{type:'Point',coordinates:[p.lon,p.lat]},
+      properties:{no:p.no,zh:p.zh,en:p.en,cat:p.cat,approx:!!p.approx,outside:!!p.outside}
+    }))
+  };
+  downloadFile('chengdu-projects.geojson',JSON.stringify(gj,null,1),'application/geo+json');
+  toast(S.lang==='zh'?'GeoJSON 已导出':'GeoJSON exported');
+};
+
+function updateScaleBar(){
+  const el=document.getElementById('scaleBar');
+  if(!el)return;
+  if(amapActive||!S.vb){el.style.display='none';return;}
+  el.style.display='';
+  const mPerPx=95.4*unitsPerPx();
+  const target=80*mPerPx;
+  const nice=[50,100,200,500,1000,2000,5000,10000,20000,50000];
+  const d=nice.find(n=>n>=target)||50000;
+  const px=Math.round(d/mPerPx);
+  const bar=el.querySelector('.bar');
+  if(bar)bar.style.width=px+'px';
+  const t=document.getElementById('scaleText');
+  if(t)t.textContent=d>=1000?(d/1000)+' km':d+' m';
+}
+
+/* 收藏 / 建筑师筛选 / 排序 / 打印 / GPX */
+const FAVS=new Set((()=>{try{return JSON.parse(localStorage.getItem('cd-favs')||'[]');}catch(e){return [];}})());
+function saveFavs(){try{localStorage.setItem('cd-favs',JSON.stringify([...FAVS]));}catch(e){}}
+function initArchSel(){
+  const sel=document.getElementById('archSel');
+  if(!sel)return;
+  const cnt={};
+  Object.values(META).forEach(m=>{if(m.arch)cnt[m.arch]=(cnt[m.arch]||0)+1;});
+  Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]||a.localeCompare(b)).forEach(a=>{
+    const o=document.createElement('option');
+    o.value=a;o.textContent=a+' ('+cnt[a]+')';
+    sel.appendChild(o);
+  });
+  sel.onchange=()=>{S.arch=sel.value;renderPoints();renderList();updateCounts();};
+}
+document.getElementById('dFav').onclick=()=>{
+  const no=S.activeId;if(!no)return;
+  if(FAVS.has(no))FAVS.delete(no);else FAVS.add(no);
+  saveFavs();
+  const b=document.getElementById('dFav');
+  b.textContent=FAVS.has(no)?'★':'☆';
+  b.classList.toggle('on',FAVS.has(no));
+  renderPoints();renderList();updateCounts();
+};
+document.getElementById('favOnly').onclick=()=>{
+  S.favOnly=!S.favOnly;
+  document.getElementById('favOnly').classList.toggle('on',S.favOnly);
+  renderPoints();renderList();updateCounts();
+};
+document.getElementById('sortDist').onclick=()=>{
+  S.sortDist=!S.sortDist;
+  document.getElementById('sortDist').classList.toggle('on',S.sortDist);
+  renderList();
+};
+document.getElementById('btnPrint').onclick=()=>{
+  try{window.print();}catch(e){}
+};
+document.getElementById('btnGPX').onclick=()=>{
+  const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const trk=ROUTES.map(r=>{
+    const pts=r.pts.map(n=>byNo[n]).filter(Boolean);
+    return '<trk><name>'+esc(r.zh)+'</name><trkseg>'+pts.map(p=>
+      '<trkpt lat="'+p.lat+'" lon="'+p.lon+'"><name>'+esc(p.zh)+'</name></trkpt>').join('')+'</trkseg></trk>';
+  }).join('');
+  const gpx='<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="chengdu-sample" xmlns="http://www.topografix.com/GPX/1/1">'+trk+'</gpx>';
+  downloadFile('chengdu-routes.gpx',gpx,'application/gpx+xml');
+  toast(S.lang==='zh'?'路线已导出为 GPX':'Routes exported as GPX');
+};
+
+/* ========== 11.7 语音 / 3D / 备注 / 信息编辑 / 大字 ========== */
+const NOTES=(()=>{let b={};try{b=JSON.parse(document.getElementById('noteStore').textContent||'{}');}catch(e){}try{Object.assign(b,JSON.parse(localStorage.getItem('cd-notes')||'{}'));}catch(e){}return b;})();
+const METAEDIT=(()=>{let b={};try{b=JSON.parse(document.getElementById('metaStore').textContent||'{}');}catch(e){}try{Object.assign(b,JSON.parse(localStorage.getItem('cd-meta')||'{}'));}catch(e){}return b;})();
+for(const k in METAEDIT)META[k]=Object.assign({},META[k]||{},METAEDIT[k]);
+
+function speakText(txt){
+  if(!('speechSynthesis' in window)){toast(S.lang==='zh'?'当前浏览器不支持朗读':'Speech not supported');return;}
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(txt);
+    u.lang=S.lang==='zh'?'zh-CN':'en-US';
+    u.rate=0.95;
+    speechSynthesis.speak(u);
+  }catch(e){toast(S.lang==='zh'?'朗读失败':'Speech failed');}
+}
+document.getElementById('btnSpeak').onclick=()=>{
+  const p=byNo[S.activeId];if(!p)return;
+  speakText((S.lang==='zh'?p.zh:p.en)+'。'+(S.lang==='zh'?p.dz:p.de));
+};
+document.getElementById('btn3D').onclick=()=>{
+  if(!(amapActive&&amap)){toast(S.lang==='zh'?'3D 视角需要高德底图':'3D needs the Amap basemap');return;}
+  const p=byNo[S.activeId];
+  amap.setPitch(amap.getPitch&&amap.getPitch()>10?0:55);
+  if(p&&amap.setZoomAndCenter)amap.setZoomAndCenter(15,[p.lon,p.lat]);
+  toast(S.lang==='zh'?'已切换 3D 倾斜视角':'3D tilt toggled');
+};
+document.getElementById('btnNoteEdit').onclick=()=>{
+  const box=document.getElementById('noteEdit');
+  const p=byNo[S.activeId];if(!p)return;
+  box.hidden=!box.hidden;
+  if(!box.hidden){document.getElementById('noteText').value=NOTES[p.no]||'';document.getElementById('noteText').focus();}
+};
+document.getElementById('noteSave').onclick=()=>{
+  const p=byNo[S.activeId];if(!p)return;
+  const v=document.getElementById('noteText').value.trim();
+  if(v)NOTES[p.no]=v;else delete NOTES[p.no];
+  try{localStorage.setItem('cd-notes',JSON.stringify(NOTES));}catch(e){}
+  document.getElementById('noteEdit').hidden=true;
+  renderNote(p);
+  toast(S.lang==='zh'?'备注已保存（本机）':'Note saved locally');
+};
+function renderNote(p){
+  const el2=document.getElementById('dNote');
+  const v=NOTES[p.no];
+  el2.hidden=!v;
+  if(v)el2.textContent=v;
+}
+document.getElementById('edSave').onclick=()=>{
+  const p=byNo[S.activeId];if(!p)return;
+  const obj={
+    arch:document.getElementById('edArch').value.trim(),
+    year:document.getElementById('edYear').value.trim(),
+    status:document.getElementById('edStatus').value.trim(),
+    area:document.getElementById('edArea').value.trim()
+  };
+  Object.keys(obj).forEach(k=>{if(!obj[k])delete obj[k];});
+  META[p.no]=Object.assign({},META[p.no]||{},obj);
+  METAEDIT[p.no]=Object.assign({},METAEDIT[p.no]||{},obj);
+  try{localStorage.setItem('cd-meta',JSON.stringify(METAEDIT));}catch(e){}
+  selectPoint(p.no,false);
+  toast(S.lang==='zh'?'信息已更新（本机）':'Details updated locally');
+};
+document.getElementById('btnBig').onclick=()=>{
+  const on=document.documentElement.classList.toggle('big-text');
+  try{localStorage.setItem('cd-big',on?'1':'0');}catch(e){}
+  document.getElementById('btnBig').classList.toggle('on',on);
+};
+try{
+  if(localStorage.getItem('cd-big')==='1'){
+    document.documentElement.classList.add('big-text');
+    document.getElementById('btnBig').classList.add('on');
+  }
+}catch(e){}
+
+/* ========== 11.8 新增 / 删除标点 ========== */
+let addMode=false, addPos=null;
+const addBtn=document.getElementById('addPointBtn');
+const addBox=document.getElementById('addBox');
+function fillCatSelect(){
+  const sel=document.getElementById('addCat');
+  if(sel.children.length)return;
+  Object.entries(CATS).forEach(([k,v])=>{
+    const o=document.createElement('option');
+    o.value=k;o.textContent=v.zh;
+    sel.appendChild(o);
+  });
+}
+function enterAdd(){
+  addMode=true;addPos=null;
+  addBtn.classList.add('on');
+  svg.classList.add('picking');
+  toast(S.lang==='zh'?'点击地图选择位置':'Tap the map to place the point');
+}
+function exitAdd(){
+  addMode=false;
+  addBtn.classList.remove('on');
+  svg.classList.remove('picking');
+  addBox.hidden=true;
+}
+function openAddForm(lon,lat){
+  addPos={lon,lat};
+  fillCatSelect();
+  document.getElementById('addCoord').textContent=lat.toFixed(5)+', '+lon.toFixed(5);
+  addBox.hidden=false;
+  const zi=document.getElementById('addZh');
+  if(zi&&zi.focus)zi.focus();
+}
+addBtn.onclick=()=>{if(addMode)exitAdd();else enterAdd();};
+document.getElementById('addClose').onclick=exitAdd;
+document.getElementById('addSave').onclick=()=>{
+  if(!addPos)return;
+  const val=id=>{const el2=document.getElementById(id);return el2&&typeof el2.value==='string'?el2.value.trim():'';};
+  const zh=val('addZh');
+  if(!zh){toast(S.lang==='zh'?'请填写中文名':'Name required');return;}
+  const maxNo=POINTS.reduce((m,p)=>Math.max(m,p.no),106);
+  const catEl=document.getElementById('addCat');
+  const cat=(catEl&&catEl.value&&CATS[catEl.value])?catEl.value:'BC';
+  const p={
+    no:maxNo+1,zh,
+    en:val('addEn')||zh,
+    cat,
+    lat:+addPos.lat.toFixed(6),lon:+addPos.lon.toFixed(6),approx:1,
+    dz:val('addDz'),de:'',
+    img:PHOTOS[maxNo+1]||'',outside:false,custom:true
+  };
+  CUSTOM.push(p);POINTS.push(p);rebuildIndex();
+  try{localStorage.setItem('cd-custom',JSON.stringify(CUSTOM));}catch(e){}
+  exitAdd();
+  renderPoints();renderList();updateCounts();
+  selectPoint(p.no,true);
+  toast(S.lang==='zh'?'已新增（本机，导出后发布）':'Point added locally');
+};
+document.getElementById('btnDelete').onclick=()=>{
+  const no=S.activeId;if(!no)return;
+  const p=byNo[no];if(!p)return;
+  const ok=confirm(S.lang==='zh'
+    ?('确定彻底删除「'+p.zh+'」？\n导出后不可恢复。')
+    :('Delete "'+p.en+'" permanently?'));
+  if(!ok)return;
+  REMOVED.add(no);
+  const i=POINTS.indexOf(p);if(i>=0)POINTS.splice(i,1);
+  const ci=CUSTOM.findIndex(c=>c.no===no);if(ci>=0)CUSTOM.splice(ci,1);
+  delete byNo[no];
+  try{
+    localStorage.setItem('cd-removed',JSON.stringify([...REMOVED]));
+    localStorage.setItem('cd-custom',JSON.stringify(CUSTOM));
+  }catch(e){}
+  closeDrawer();renderPoints();renderList();updateCounts();
+  toast(S.lang==='zh'?'已删除，导出后从页面移除':'Point removed');
 };
 
 /* ========== 12. 地图交互 ========== */
@@ -1415,6 +1857,13 @@ svg.addEventListener('wheel',e=>{
 },{passive:false});
 svg.addEventListener('click',e=>{
   if(dragMoved)return;
+  if(addMode){
+    const r=svg.getBoundingClientRect();
+    const lon=CX+(S.vb[0]+(e.clientX-r.left)/r.width*S.vb[2])/KX;
+    const lat=CY-(S.vb[1]+(e.clientY-r.top)/r.height*S.vb[3])/KY;
+    openAddForm(lon,lat);
+    return;
+  }
   if(pickMode){
     const r=svg.getBoundingClientRect();
     const lon=CX+(S.vb[0]+(e.clientX-r.left)/r.width*S.vb[2])/KX;
@@ -1727,7 +2176,7 @@ function applyLang(){
 }
 
 /* ========== 15.5 版本与自检 ========== */
-const BUILD='2026-11-16 16:20';
+const BUILD='2026-11-16 19:40';
 window.__CD_BUILD=BUILD;
 let lastError='';
 window.addEventListener('error',e=>{
@@ -1768,6 +2217,7 @@ function init(){
   updatePhotoStat();
   renderLegend();
   renderRoutesList();
+  initArchSel();
   /* 竖屏手机：全域轮廓在 390px 宽下会把 106 个点挤成一团，默认落在主城视图 */
   const portrait=window.innerWidth<700&&window.innerHeight>window.innerWidth;
   S.view=portrait?'city':'all';
@@ -1781,6 +2231,13 @@ function init(){
   applyLang();
   initDebug();
   loadBase();
+  setTimeout(applyHash,300);
+  window.addEventListener('hashchange',applyHash);
+  try{
+    if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
+    }
+  }catch(e){}
   if(AMAP_ENABLED){
     loadAmapSDK().then(()=>{
       initAmap();
