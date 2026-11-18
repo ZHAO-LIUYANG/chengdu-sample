@@ -112,6 +112,25 @@ main{display:flex;height:calc(100% - 64px);position:relative;overflow:hidden}
 .mini-btn{height:20px;padding:0 7px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--dim);font-size:9.5px;letter-spacing:.2px;cursor:pointer;font-family:inherit;transition:.15s}
 .mini-btn:hover{border-color:var(--accent);color:var(--accent)}
 .mini-btn.on{border-color:var(--accent);color:var(--accent);background:rgba(200,169,106,.12)}
+.mini-btn.strong{border-color:var(--accent);color:var(--accent)}
+.mini-btn.danger{color:#E07A5F;border-color:rgba(224,122,95,.4)}
+.mini-btn.danger:hover{background:rgba(224,122,95,.12)}
+.mini-btn.nav{width:24px;padding:0;font-size:14px;line-height:1}
+.edit-panel{padding:0 20px 16px;display:flex;flex-direction:column;gap:8px}
+.edit-panel[hidden]{display:none}
+.edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.edit-grid label,.edit-wide{display:flex;flex-direction:column;gap:3px;font-size:10px;color:var(--dim)}
+.edit-grid input,.edit-grid select,.edit-wide textarea{border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:6px;padding:5px 7px;font-size:11.5px;font-family:inherit;outline:none;min-width:0}
+.edit-grid input:focus,.edit-grid select:focus,.edit-wide textarea:focus{border-color:var(--accent)}
+.edit-actions{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.unpub{position:absolute;left:50%;transform:translateX(-50%);top:14px;display:flex;align-items:center;gap:10px;background:rgba(200,169,106,.14);border:1px solid var(--accent);color:var(--accent);border-radius:20px;padding:5px 6px 5px 14px;font-size:11px;z-index:22;box-shadow:var(--shadow)}
+.unpub[hidden]{display:none}
+.unpub button{border:none;background:var(--accent);color:#12161c;border-radius:14px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:inherit}
+.undo{position:absolute;left:50%;transform:translateX(-50%);bottom:66px;display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:5px 6px 5px 14px;font-size:11.5px;color:var(--text);z-index:23;box-shadow:var(--shadow)}
+.undo[hidden]{display:none}
+.undo button{border:none;background:var(--accent);color:#12161c;border-radius:14px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:inherit}
+#mapWrap.drawer-open .geo-btn,#mapWrap.drawer-open .add-btn{right:406px}
+@media(max-width:860px){#mapWrap.drawer-open .geo-btn,#mapWrap.drawer-open .add-btn{right:10px}}
 .drawer-fav{position:absolute;top:14px;right:50px;width:28px;height:28px;border:none;background:var(--panel2);color:var(--dim);border-radius:50%;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;transition:.18s}
 .drawer-fav:hover{background:var(--border);color:var(--text)}
 .drawer-fav.on{color:var(--accent)}
@@ -320,6 +339,9 @@ html.big-text .near-item{font-size:13.5px}
 
 <main>
   <aside id="sidebar">
+    <div class="section" style="padding:12px 18px">
+      <button id="sideAdd" class="export-btn" data-zh="＋ 新增标点" data-en="＋ Add point">＋ 新增标点</button>
+    </div>
     <div class="section">
       <div class="section-title"><span data-zh="维度筛选" data-en="Categories">维度筛选</span><span id="visCount" style="color:var(--accent)"></span></div>
       <div id="legend"></div>
@@ -358,6 +380,7 @@ html.big-text .near-item{font-size:13.5px}
     </div>
     <div class="map-scale" id="scaleBar"><i class="bar"></i><span id="scaleText"></span><b class="north">N↑</b></div>
     <div class="map-credit">路网 / 水系 © OpenStreetMap contributors</div>
+    <div id="unpub" class="unpub" hidden><span data-zh="有未发布的修改" data-en="Unpublished changes">有未发布的修改</span><button id="unpubExport" data-zh="导出" data-en="Export">导出</button></div>
     <button id="geoBtn" class="geo-btn" aria-label="我的位置" title="我的位置">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
         <circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v3M12 18.8v3M2.2 12h3M18.8 12h3"/>
@@ -381,6 +404,7 @@ html.big-text .near-item{font-size:13.5px}
       <div id="nearList" class="near-list"></div>
     </div>
     <div id="toast" class="toast"></div>
+    <div id="undo" class="undo" hidden><span id="undoTxt"></span><button id="undoBtn" data-zh="撤销" data-en="Undo">撤销</button></div>
   </div>
 
   <aside id="drawer">
@@ -397,24 +421,38 @@ html.big-text .near-item{font-size:13.5px}
       <div class="drawer-desc" id="dDesc"></div>
       <div class="drawer-note" id="dNote" hidden></div>
       <div class="drawer-tools">
+        <button id="dPrev" class="mini-btn nav" aria-label="上一个" title="上一个">‹</button>
+        <button id="dNext" class="mini-btn nav" aria-label="下一个" title="下一个">›</button>
         <button id="btnSpeak" class="mini-btn" data-zh="朗读" data-en="Read aloud">朗读</button>
         <button id="btn3D" class="mini-btn" data-zh="3D 视角" data-en="3D view">3D 视角</button>
         <button id="btnNoteEdit" class="mini-btn" data-zh="备注" data-en="Note">备注</button>
+        <button id="btnEdit" class="mini-btn strong" data-zh="编辑" data-en="Edit">编辑</button>
       </div>
       <div class="note-edit" id="noteEdit" hidden>
         <textarea id="noteText" rows="3" placeholder="写下你的观察（只存在本机，导出后随页面发布）"></textarea>
         <button id="noteSave" class="export-btn small" data-zh="保存备注" data-en="Save note">保存备注</button>
       </div>
-      <details class="meta-edit" id="metaEdit">
-        <summary data-zh="补充 / 修正信息" data-en="Edit details">补充 / 修正信息</summary>
-        <div class="meta-grid">
-          <input id="edArch" placeholder="建筑师">
-          <input id="edYear" placeholder="年代（2021）">
-          <input id="edStatus" placeholder="状态（建成/在建/改造）">
-          <input id="edArea" placeholder="面积（12,000 ㎡）">
+      <div class="edit-panel" id="editPanel" hidden>
+        <div class="edit-grid">
+          <label><span>中文名</span><input id="eZh" maxlength="40"></label>
+          <label><span>英文名</span><input id="eEn" maxlength="60"></label>
+          <label><span>类别</span><select id="eCat"></select></label>
+          <label><span>纬度</span><input id="eLat" inputmode="decimal"></label>
+          <label><span>经度</span><input id="eLon" inputmode="decimal"></label>
+          <label><span>建筑师</span><input id="eArch"></label>
+          <label><span>年代</span><input id="eYear"></label>
+          <label><span>状态</span><input id="eStatus"></label>
+          <label><span>面积</span><input id="eArea"></label>
+          <label><span>定位精度</span><select id="eApprox"><option value="1">片区近似</option><option value="0">精确</option></select></label>
         </div>
-        <button id="edSave" class="export-btn small" data-zh="保存信息" data-en="Save details">保存信息</button>
-      </details>
+        <label class="edit-wide"><span>简介</span><textarea id="eDz" rows="3" maxlength="400"></textarea></label>
+        <div class="edit-actions">
+          <button id="ePick" class="mini-btn" data-zh="地图上重选位置" data-en="Pick on map">地图上重选位置</button>
+          <button id="eSave" class="export-btn small" data-zh="保存修改" data-en="Save">保存修改</button>
+          <button id="eCancel" class="mini-btn" data-zh="取消" data-en="Cancel">取消</button>
+          <button id="eDelete" class="mini-btn danger" data-zh="删除" data-en="Delete">删除</button>
+        </div>
+      </div>
       <div class="drawer-meta">
         <div class="meta-row"><span data-zh="编号" data-en="No.">编号</span><span id="dNo"></span></div>
         <div class="meta-row"><span data-zh="维度" data-en="Category">维度</span><span id="dCatTxt"></span></div>
@@ -425,7 +463,6 @@ html.big-text .near-item{font-size:13.5px}
         <div class="meta-row" id="mStatus" style="display:none"><span data-zh="状态" data-en="Status">状态</span><span id="dStatus"></span></div>
         <div class="meta-row" id="mArea" style="display:none"><span data-zh="面积" data-en="Floor area">面积</span><span id="dArea"></span></div>
         <div class="meta-row" id="mSrc" style="display:none"><span data-zh="资料来源" data-en="Source">资料来源</span><span><a id="dSrc" class="src-link" target="_blank" rel="noopener" data-zh="查看原文" data-en="Open source">查看原文</a></span></div>
-        <div class="meta-row" id="mDel"><span data-zh="管理" data-en="Manage">管理</span><span><button id="btnDelete" class="danger-link" data-zh="彻底删除此点" data-en="Delete point">彻底删除此点</button></span></div>
         <div class="meta-row" id="dOutRow" style="display:none"><span data-zh="市域范围" data-en="City limits">市域范围</span><span data-zh="市域外（邻近地区）" data-en="Outside city limits">市域外（邻近地区）</span></div>
         <div class="meta-row" id="dDistRow" style="display:none"><span data-zh="距我" data-en="Distance">距我</span><span id="dDist"></span></div>
       </div>
@@ -586,6 +623,8 @@ const CUSTOM=(()=>{try{return JSON.parse(localStorage.getItem('cd-custom')||'[]'
 const REMOVED=new Set((()=>{try{return JSON.parse(localStorage.getItem('cd-removed')||'[]');}catch(e){return[];}})());
 for(let i=POINTS.length-1;i>=0;i--){if(REMOVED.has(POINTS[i].no))POINTS.splice(i,1);}
 CUSTOM.forEach(c=>{if(!byNo[c.no])POINTS.push(c);});
+const EDITS=(()=>{try{return JSON.parse(localStorage.getItem('cd-edits')||'{}');}catch(e){return{};}})();
+POINTS.forEach(p=>{const e=EDITS[p.no];if(e)Object.assign(p,e);});
 function rebuildIndex(){
   POINTS.sort((a,b)=>a.no-b.no);
   Object.keys(byNo).forEach(k=>delete byNo[k]);
@@ -1017,8 +1056,9 @@ function initAmap(){
   amap.on('click',e=>{
     if(addMode){openAddForm(e.lnglat.getLng(),e.lnglat.getLat());return;}
     if(!pickMode)return;
-    setPos(e.lnglat.getLng(),e.lnglat.getLat(),null,true);
-    exitPick();
+    const cb=pickCb;exitPick();
+    if(cb)cb(e.lnglat.getLng(),e.lnglat.getLat());
+    else setPos(e.lnglat.getLng(),e.lnglat.getLat(),null,true);
   });
 }
 function amapSync(){
@@ -1358,10 +1398,7 @@ function selectPoint(no,fly){
   favBtn.classList.toggle('on',FAVS.has(p.no));
   renderNote(p);
   document.getElementById('noteEdit').hidden=true;
-  document.getElementById('edArch').value=mm.arch||'';
-  document.getElementById('edYear').value=mm.year||'';
-  document.getElementById('edStatus').value=mm.status||'';
-  document.getElementById('edArea').value=mm.area||'';
+  document.getElementById('editPanel').hidden=true;
   document.getElementById('dOutRow').style.display=p.outside?'flex':'none';
   const distRow=document.getElementById('dDistRow');
   if(myPos){
@@ -1374,6 +1411,7 @@ function selectPoint(no,fly){
   document.getElementById('amapNav').disabled=false;
   renderDrawerImage(p);
   drawer.classList.add('open');
+  document.getElementById('mapWrap').classList.add('drawer-open');
   document.getElementById('overlay').classList.add('show');
   if(fly){
     if(amapActive&&amap){
@@ -1390,6 +1428,7 @@ function selectPoint(no,fly){
 }
 function closeDrawer(){
   drawer.classList.remove('open');
+  document.getElementById('mapWrap').classList.remove('drawer-open');
   document.getElementById('overlay').classList.remove('show');
   S.activeId=null;
   setHash(null);
@@ -1450,6 +1489,7 @@ function savePhotos(){
   try{
     localStorage.setItem('cd-photos',JSON.stringify(PHOTOS));
     updatePhotoStat();
+    updateUnpub();
     return true;
   }catch(err){
     toast(S.lang==='zh'?'本机存储已满，请先“导出带图页面”':'Local storage full — export first');
@@ -1518,7 +1558,7 @@ document.getElementById('btnExport').onclick=async()=>{
     if(!res.ok)throw new Error('HTTP '+res.status);
     let src=await res.text();
     /* 点位发生变化（新增/删除）时重写 RAW */
-    if(CUSTOM.length||REMOVED.size){
+    if(CUSTOM.length||REMOVED.size||Object.keys(EDITS).length){
       const rows=POINTS.map(p=>[p.no,p.zh,p.en,p.cat,p.lat,p.lon,p.approx?1:0,p.dz||'',p.de||'']);
       const rawLit='const RAW=[\n'+rows.map(r=>JSON.stringify(r)).join(',\n')+'\n];';
       if(!/const RAW=\[[\s\S]*?\n\];/.test(src))throw new Error('RAW missing');
@@ -1698,6 +1738,7 @@ document.getElementById('noteSave').onclick=()=>{
   const v=document.getElementById('noteText').value.trim();
   if(v)NOTES[p.no]=v;else delete NOTES[p.no];
   try{localStorage.setItem('cd-notes',JSON.stringify(NOTES));}catch(e){}
+  updateUnpub();
   document.getElementById('noteEdit').hidden=true;
   renderNote(p);
   toast(S.lang==='zh'?'备注已保存（本机）':'Note saved locally');
@@ -1708,21 +1749,6 @@ function renderNote(p){
   el2.hidden=!v;
   if(v)el2.textContent=v;
 }
-document.getElementById('edSave').onclick=()=>{
-  const p=byNo[S.activeId];if(!p)return;
-  const obj={
-    arch:document.getElementById('edArch').value.trim(),
-    year:document.getElementById('edYear').value.trim(),
-    status:document.getElementById('edStatus').value.trim(),
-    area:document.getElementById('edArea').value.trim()
-  };
-  Object.keys(obj).forEach(k=>{if(!obj[k])delete obj[k];});
-  META[p.no]=Object.assign({},META[p.no]||{},obj);
-  METAEDIT[p.no]=Object.assign({},METAEDIT[p.no]||{},obj);
-  try{localStorage.setItem('cd-meta',JSON.stringify(METAEDIT));}catch(e){}
-  selectPoint(p.no,false);
-  toast(S.lang==='zh'?'信息已更新（本机）':'Details updated locally');
-};
 document.getElementById('btnBig').onclick=()=>{
   const on=document.documentElement.classList.toggle('big-text');
   try{localStorage.setItem('cd-big',on?'1':'0');}catch(e){}
@@ -1788,28 +1814,138 @@ document.getElementById('addSave').onclick=()=>{
   };
   CUSTOM.push(p);POINTS.push(p);rebuildIndex();
   try{localStorage.setItem('cd-custom',JSON.stringify(CUSTOM));}catch(e){}
+  updateUnpub();
   exitAdd();
   renderPoints();renderList();updateCounts();
   selectPoint(p.no,true);
   toast(S.lang==='zh'?'已新增（本机，导出后发布）':'Point added locally');
 };
-document.getElementById('btnDelete').onclick=()=>{
+/* 删除（可撤销 6 秒） */
+let lastDeleted=null, undoTimer=null;
+function deletePoint(){
   const no=S.activeId;if(!no)return;
   const p=byNo[no];if(!p)return;
   const ok=confirm(S.lang==='zh'
-    ?('确定彻底删除「'+p.zh+'」？\n导出后不可恢复。')
-    :('Delete "'+p.en+'" permanently?'));
+    ?('确定删除「'+p.zh+'」？\n6 秒内可撤销，导出后不可恢复。')
+    :('Delete "'+p.en+'"? Undo within 6s.'));
   if(!ok)return;
+  lastDeleted={p,index:POINTS.indexOf(p),customIdx:CUSTOM.findIndex(c=>c.no===no),no};
   REMOVED.add(no);
   const i=POINTS.indexOf(p);if(i>=0)POINTS.splice(i,1);
   const ci=CUSTOM.findIndex(c=>c.no===no);if(ci>=0)CUSTOM.splice(ci,1);
   delete byNo[no];
-  try{
-    localStorage.setItem('cd-removed',JSON.stringify([...REMOVED]));
-    localStorage.setItem('cd-custom',JSON.stringify(CUSTOM));
-  }catch(e){}
-  closeDrawer();renderPoints();renderList();updateCounts();
-  toast(S.lang==='zh'?'已删除，导出后从页面移除':'Point removed');
+  try{localStorage.setItem('cd-removed',JSON.stringify([...REMOVED]));localStorage.setItem('cd-custom',JSON.stringify(CUSTOM));}catch(e){}
+  closeDrawer();renderPoints();renderList();updateCounts();updateUnpub();
+  showUndo(S.lang==='zh'?('已删除「'+p.zh+'」'):('Deleted "'+p.en+'"'));
+}
+document.getElementById('eDelete').onclick=deletePoint;
+function showUndo(msg){
+  const bar=document.getElementById('undo');
+  document.getElementById('undoTxt').textContent=msg;
+  bar.hidden=false;
+  clearTimeout(undoTimer);
+  undoTimer=setTimeout(()=>{bar.hidden=true;lastDeleted=null;},6000);
+}
+document.getElementById('undoBtn').onclick=()=>{
+  const d=lastDeleted;if(!d)return;
+  REMOVED.delete(d.no);
+  POINTS.splice(Math.max(0,d.index),0,d.p);
+  if(d.customIdx>=0)CUSTOM.push(d.p);
+  rebuildIndex();
+  try{localStorage.setItem('cd-removed',JSON.stringify([...REMOVED]));localStorage.setItem('cd-custom',JSON.stringify(CUSTOM));}catch(e){}
+  document.getElementById('undo').hidden=true;
+  lastDeleted=null;clearTimeout(undoTimer);
+  renderPoints();renderList();updateCounts();updateUnpub();
+};
+
+/* 编辑面板 */
+let editNo=null;
+function fillCatSel(){
+  const sel=document.getElementById('eCat');
+  if(!sel||sel.children.length)return;
+  Object.entries(CATS).forEach(([k,v])=>{
+    const o=document.createElement('option');o.value=k;o.textContent=v.zh;sel.appendChild(o);
+  });
+}
+function openEdit(p){
+  editNo=p.no;
+  const m=META[p.no]||{};
+  fillCatSel();
+  const set=(id,v)=>{const el3=document.getElementById(id);if(el3)el3.value=v==null?'':v;};
+  set('eZh',p.zh);set('eEn',p.en);set('eLat',p.lat);set('eLon',p.lon);
+  set('eArch',m.arch);set('eYear',m.year);set('eStatus',m.status);set('eArea',m.area);set('eDz',p.dz);
+  const cs=document.getElementById('eCat');if(cs)cs.value=p.cat;
+  const ap=document.getElementById('eApprox');if(ap)ap.value=p.approx?'1':'0';
+  document.getElementById('editPanel').hidden=false;
+  document.getElementById('noteEdit').hidden=true;
+  document.getElementById('editPanel').scrollIntoView&&document.getElementById('editPanel').scrollIntoView({block:'nearest'});
+}
+document.getElementById('btnEdit').onclick=()=>{
+  const p=byNo[S.activeId];if(p)openEdit(p);
+};
+document.getElementById('eCancel').onclick=()=>{document.getElementById('editPanel').hidden=true;};
+document.getElementById('ePick').onclick=()=>{
+  const p=byNo[editNo];if(!p)return;
+  enterPick((lon,lat)=>{
+    const la=document.getElementById('eLat'),lo=document.getElementById('eLon');
+    if(la)la.value=lat.toFixed(6);
+    if(lo)lo.value=lon.toFixed(6);
+    toast(S.lang==='zh'?'已选新位置，记得点「保存修改」':'Picked — press Save');
+  });
+};
+document.getElementById('eSave').onclick=()=>{
+  const p=byNo[editNo];if(!p)return;
+  const v=id=>{const el3=document.getElementById(id);return el3&&typeof el3.value==='string'?el3.value.trim():'';};
+  const zh=v('eZh')||p.zh;
+  const lat=parseFloat(v('eLat')),lon=parseFloat(v('eLon'));
+  const catEl=document.getElementById('eCat');
+  const patch={zh,en:v('eEn')||zh,dz:v('eDz'),cat:(catEl&&catEl.value)||p.cat};
+  const ap=document.getElementById('eApprox');
+  if(ap)patch.approx=ap.value==='0'?0:1;
+  if(isFinite(lat)&&Math.abs(lat)<90)patch.lat=+lat.toFixed(6);
+  if(isFinite(lon)&&Math.abs(lon)<180)patch.lon=+lon.toFixed(6);
+  Object.assign(p,patch);
+  EDITS[p.no]=Object.assign({},EDITS[p.no]||{},patch);
+  const meta={arch:v('eArch'),year:v('eYear'),status:v('eStatus'),area:v('eArea')};
+  Object.keys(meta).forEach(k=>{if(meta[k])META[p.no]=Object.assign({},META[p.no]||{},(function(){const o={};o[k]=meta[k];return o;})());});
+  METAEDIT[p.no]=Object.assign({},METAEDIT[p.no]||{},meta);
+  try{localStorage.setItem('cd-edits',JSON.stringify(EDITS));localStorage.setItem('cd-meta',JSON.stringify(METAEDIT));}catch(e){}
+  document.getElementById('editPanel').hidden=true;
+  selectPoint(p.no,false);
+  updateUnpub();
+  toast(S.lang==='zh'?'已保存（本机，导出后发布）':'Saved locally');
+};
+
+/* 上一个 / 下一个 */
+function listOrder(){
+  const arr=POINTS.filter(ptVisible).filter(inView);
+  if(S.sortDist&&myPos)arr.sort((a,b)=>haversine(myPos.lat,myPos.lon,a.lat,a.lon)-haversine(myPos.lat,myPos.lon,b.lat,b.lon));
+  else arr.sort((a,b)=>a.no-b.no);
+  return arr;
+}
+function stepPoint(dir){
+  const arr=listOrder();if(!arr.length)return;
+  let i=arr.findIndex(p=>p.no===S.activeId);
+  i=(i+dir+arr.length)%arr.length;
+  selectPoint(arr[i].no,true);
+}
+document.getElementById('dPrev').onclick=()=>stepPoint(-1);
+document.getElementById('dNext').onclick=()=>stepPoint(1);
+
+/* 未发布提示 */
+function isDirty(){
+  return !!(CUSTOM.length||REMOVED.size||Object.keys(EDITS).length||Object.keys(PHOTOS).length||Object.keys(NOTES).length||Object.keys(METAEDIT).length);
+}
+function updateUnpub(){
+  const el2=document.getElementById('unpub');
+  if(el2)el2.hidden=!isDirty();
+}
+document.getElementById('unpubExport').onclick=()=>document.getElementById('btnExport').click();
+document.getElementById('sideAdd').onclick=()=>{
+  closeDrawer();
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+  enterAdd();
 };
 
 /* ========== 12. 地图交互 ========== */
@@ -1868,8 +2004,9 @@ svg.addEventListener('click',e=>{
     const r=svg.getBoundingClientRect();
     const lon=CX+(S.vb[0]+(e.clientX-r.left)/r.width*S.vb[2])/KX;
     const lat=CY-(S.vb[1]+(e.clientY-r.top)/r.height*S.vb[3])/KY;
-    setPos(lon,lat,null,true);
+    const cb=pickCb;
     exitPick();
+    if(cb)cb(lon,lat); else setPos(lon,lat,null,true);
     return;
   }
   const g=e.target.closest?e.target.closest('.pt'):null;
@@ -2020,15 +2157,17 @@ function flyToMe(){
     lat0:myPos.lat-span/2*1.15,lat1:myPos.lat+span/2*1.15
   })));
 }
-let pickMode=false;
-function enterPick(){
+let pickMode=false, pickCb=null;
+function enterPick(cb){
   pickMode=true;
+  pickCb=cb||null;
   geoBtn.classList.add('on');
   svg.classList.add('picking');
-  toast(S.lang==='zh'?'点击地图上的位置，设为“我的位置”':'Tap the map to set your location');
+  toast(S.lang==='zh'?'点击地图上的位置':'Tap a position on the map');
 }
 function exitPick(){
   pickMode=false;
+  pickCb=null;
   geoBtn.classList.remove('on');
   svg.classList.remove('picking');
 }
@@ -2176,7 +2315,7 @@ function applyLang(){
 }
 
 /* ========== 15.5 版本与自检 ========== */
-const BUILD='2026-11-17 11:05';
+const BUILD='2026-11-18 11:40';
 window.__CD_BUILD=BUILD;
 let lastError='';
 window.addEventListener('error',e=>{
@@ -2231,6 +2370,7 @@ function init(){
   applyLang();
   initDebug();
   loadBase();
+  updateUnpub();
   setTimeout(applyHash,300);
   window.addEventListener('hashchange',applyHash);
   try{
